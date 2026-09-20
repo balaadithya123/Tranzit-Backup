@@ -21,13 +21,10 @@ import {
   ShieldCheck, 
   PhoneCall, 
   X, 
-  Sliders, 
-  HelpCircle,
-  Clock,
-  ChevronRight,
   Zap,
   AlertCircle
 } from 'lucide-react';
+import { StatCard } from './StatCard';
 
 interface SubscriptionViewProps {
   owner: OwnerProfile;
@@ -43,7 +40,7 @@ export const SubscriptionView: React.FC<SubscriptionViewProps> = ({
   const [pricing, setPricing] = useState<TierPricingConfig>(DEFAULT_TIER_PRICING);
   const actualFleetCount = owner.activeBusesCount ?? 0;
   
-  // Interactive bus count calculator (defaults to owner's current fleet size or 1)
+  // Interactive bus count calculator (defaults to owner's current fleet size or 3)
   const [calculatorBusCount, setCalculatorBusCount] = useState<number>(
     actualFleetCount > 0 ? actualFleetCount : 3
   );
@@ -136,31 +133,29 @@ export const SubscriptionView: React.FC<SubscriptionViewProps> = ({
   ];
 
   return (
-    <div className="space-y-6 pb-12">
-      {/* Header Banner */}
-      <div className="bg-white dark:bg-[#121214] border border-slate-200 dark:border-neutral-800 p-5 sm:p-6 rounded-xl shadow-xs transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-300">
+      {/* SECTION 1: HEADER */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-slate-200/80 dark:border-neutral-800">
         <div>
-          <div className="flex items-center space-x-2 text-xs font-mono text-amber-700 dark:text-amber-400 uppercase tracking-widest mb-1.5 font-bold">
-            <Zap className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-            <span>SaaS Subscription Plans</span>
+          <div className="flex items-center space-x-2">
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-sans tracking-tight">
+              Carrier Subscription & Plans
+            </h1>
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
+              Predictable SaaS Pricing
+            </span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-neutral-100 tracking-tight font-sans">
-            Fleet Subscription & Tier Pricing
-          </h1>
-          <p className="text-xs text-slate-500 dark:text-neutral-400 font-sans mt-1 max-w-2xl">
-            Predictable per-bus monthly plans established by platform administration. Select your tier based on fleet scale — no surprise licensing charges.
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-neutral-400 mt-1">
+            Simple per-bus monthly plans. Select your tier based on fleet scale with no hidden licensing fees.
           </p>
         </div>
 
-        {/* Current status pill */}
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="px-3 py-2 bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-lg text-right">
-            <div className="text-[10px] font-mono uppercase tracking-wider text-slate-400 dark:text-neutral-500 font-semibold">
-              Current Active Fleet
-            </div>
-            <div className="text-sm font-bold font-mono text-slate-900 dark:text-neutral-100 flex items-center justify-end space-x-1.5">
-              <Bus className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-              <span>{actualFleetCount} {actualFleetCount === 1 ? 'Bus' : 'Buses'}</span>
+        <div className="flex items-center space-x-2">
+          <div className="px-3.5 py-1.5 bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-xl flex items-center space-x-2">
+            <Bus className="w-4 h-4 text-blue-600" />
+            <div className="text-xs font-mono">
+              <span className="text-slate-400">Active Fleet: </span>
+              <span className="font-bold text-slate-900 dark:text-white">{actualFleetCount} Buses</span>
             </div>
           </div>
         </div>
@@ -168,7 +163,7 @@ export const SubscriptionView: React.FC<SubscriptionViewProps> = ({
 
       {/* Success Notification */}
       {selectionSuccess && (
-        <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 text-emerald-900 dark:text-emerald-200 rounded-xl flex items-center justify-between shadow-xs animate-in fade-in">
+        <div className="p-4 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200 rounded-2xl flex items-center justify-between shadow-2xs animate-in fade-in">
           <div className="flex items-center space-x-3">
             <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
             <div>
@@ -190,7 +185,7 @@ export const SubscriptionView: React.FC<SubscriptionViewProps> = ({
 
       {/* Error Notification */}
       {selectionError && (
-        <div className="p-4 bg-rose-500/10 border border-rose-500/30 text-rose-900 dark:text-rose-200 rounded-xl flex items-center justify-between shadow-xs animate-in fade-in">
+        <div className="p-4 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-900 dark:text-rose-200 rounded-2xl flex items-center justify-between shadow-2xs animate-in fade-in">
           <div className="flex items-center space-x-3">
             <AlertCircle className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0" />
             <p className="text-xs font-mono font-bold">{selectionError}</p>
@@ -205,49 +200,46 @@ export const SubscriptionView: React.FC<SubscriptionViewProps> = ({
         </div>
       )}
 
-      {/* Interactive Fleet Size & Cost Calculator */}
-      <div className="bg-white dark:bg-[#121214] border border-slate-200 dark:border-neutral-800 rounded-xl p-5 sm:p-6 shadow-xs">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-5 border-b border-slate-100 dark:border-neutral-800/80">
-          <div className="space-y-1">
+      {/* SECTION 2: ESTIMATOR CALCULATOR */}
+      <div className="bg-white dark:bg-[#10131a] border border-slate-200/90 dark:border-neutral-800/80 rounded-2xl p-5 sm:p-6 shadow-2xs space-y-4">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-neutral-800">
+          <div>
             <div className="flex items-center space-x-2">
-              <Calculator className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-              <h2 className="text-sm font-bold uppercase font-mono tracking-wide text-slate-900 dark:text-neutral-100">
+              <Calculator className="w-4 h-4 text-blue-600" />
+              <h2 className="text-sm font-bold uppercase font-mono tracking-wide text-slate-900 dark:text-white">
                 Fleet Size Cost Estimator
               </h2>
             </div>
-            <p className="text-xs text-slate-500 dark:text-neutral-400 font-sans">
-              Enter or slide to simulate your expected fleet size. The estimated monthly total adjusts live using each tier's fixed per-bus rate.
+            <p className="text-xs text-slate-500 dark:text-neutral-400 font-sans mt-0.5">
+              Simulate your expected fleet size to see the per-bus monthly cost in each tier.
             </p>
           </div>
 
-          {/* Stepper + Input */}
           <div className="flex items-center space-x-3">
-            <div className="flex items-center border border-slate-200 dark:border-neutral-700 rounded-lg overflow-hidden bg-slate-50 dark:bg-neutral-900">
+            <div className="flex items-center border border-slate-200 dark:border-neutral-800 rounded-xl overflow-hidden bg-slate-50 dark:bg-neutral-900">
               <button
                 type="button"
                 onClick={() => handleBusCountChange(calculatorBusCount - 1)}
-                className="px-3 py-2 text-sm font-bold text-slate-600 dark:text-neutral-300 hover:bg-slate-200 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
+                className="px-3.5 py-2 text-sm font-bold text-slate-600 dark:text-neutral-300 hover:bg-slate-200 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
                 aria-label="Decrease bus count"
               >
                 -
               </button>
-              <div className="relative flex items-center">
+              <div className="relative flex items-center px-2">
                 <input
                   type="number"
                   min={1}
                   max={500}
                   value={calculatorBusCount}
                   onChange={(e) => handleBusCountChange(Number(e.target.value))}
-                  className="w-20 py-1.5 text-center font-mono font-extrabold text-slate-900 dark:text-neutral-100 text-sm bg-transparent focus:outline-hidden"
+                  className="w-16 py-1 text-center font-mono font-black text-slate-900 dark:text-white text-sm bg-transparent focus:outline-none"
                 />
-                <span className="text-[10px] font-mono text-slate-400 dark:text-neutral-500 pr-2">
-                  buses
-                </span>
+                <span className="text-[10px] font-mono text-slate-400">buses</span>
               </div>
               <button
                 type="button"
                 onClick={() => handleBusCountChange(calculatorBusCount + 1)}
-                className="px-3 py-2 text-sm font-bold text-slate-600 dark:text-neutral-300 hover:bg-slate-200 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
+                className="px-3.5 py-2 text-sm font-bold text-slate-600 dark:text-neutral-300 hover:bg-slate-200 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
                 aria-label="Increase bus count"
               >
                 +
@@ -256,29 +248,19 @@ export const SubscriptionView: React.FC<SubscriptionViewProps> = ({
           </div>
         </div>
 
-        {/* Range Slider & Quick Presets */}
-        <div className="mt-5 space-y-4">
-          <div className="space-y-1.5">
-            <div className="flex justify-between text-[11px] font-mono text-slate-500 dark:text-neutral-400">
-              <span>1 Bus (Starter)</span>
-              <span>20 Buses (Growth)</span>
-              <span>50+ Buses (Enterprise)</span>
-            </div>
-            <input
-              type="range"
-              min={1}
-              max={60}
-              value={Math.min(60, calculatorBusCount)}
-              onChange={(e) => handleBusCountChange(Number(e.target.value))}
-              className="w-full h-2 bg-slate-200 dark:bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-amber-500"
-            />
-          </div>
+        {/* Range Slider & Presets */}
+        <div className="space-y-3 pt-1">
+          <input
+            type="range"
+            min={1}
+            max={60}
+            value={Math.min(60, calculatorBusCount)}
+            onChange={(e) => handleBusCountChange(Number(e.target.value))}
+            className="w-full h-2 bg-slate-200 dark:bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-blue-600"
+          />
 
-          {/* Quick preset chips */}
           <div className="flex flex-wrap items-center gap-2 pt-1">
-            <span className="text-[11px] font-mono text-slate-400 dark:text-neutral-500 mr-1">
-              Presets:
-            </span>
+            <span className="text-[11px] font-mono text-slate-400 mr-1">Quick Presets:</span>
             {presetValues.map((preset, idx) => {
               const isSelected = calculatorBusCount === preset.value;
               return (
@@ -286,10 +268,10 @@ export const SubscriptionView: React.FC<SubscriptionViewProps> = ({
                   key={idx}
                   type="button"
                   onClick={() => handleBusCountChange(preset.value)}
-                  className={`px-2.5 py-1 text-xs font-mono rounded-md border transition-all cursor-pointer ${
+                  className={`px-3 py-1 text-xs font-mono rounded-xl border transition-all cursor-pointer ${
                     isSelected
-                      ? 'bg-slate-900 text-white dark:bg-amber-500 dark:text-slate-950 border-transparent font-bold shadow-2xs'
-                      : 'bg-slate-50 dark:bg-neutral-900/60 text-slate-600 dark:text-neutral-400 border-slate-200 dark:border-neutral-800 hover:border-slate-300 dark:hover:border-neutral-700'
+                      ? 'bg-blue-600 text-white border-blue-600 font-bold shadow-xs'
+                      : 'bg-slate-50 dark:bg-neutral-900 text-slate-600 dark:text-neutral-400 border-slate-200 dark:border-neutral-800 hover:border-slate-300'
                   }`}
                 >
                   {preset.label}
@@ -300,8 +282,8 @@ export const SubscriptionView: React.FC<SubscriptionViewProps> = ({
         </div>
       </div>
 
-      {/* Plan Tiers Grid (Requirement 1, 2, 3, 4) */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+      {/* SECTION 3: PLAN TIERS GRID */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
         {PLAN_TIERS.map((tier) => {
           const isActualFleetMatch = actualFleetTier.id === tier.id;
           const isCurrentPlan = currentSelectedTierId === tier.id;
@@ -313,40 +295,39 @@ export const SubscriptionView: React.FC<SubscriptionViewProps> = ({
           return (
             <div
               key={tier.id}
-              className={`relative flex flex-col justify-between rounded-xl border transition-all duration-200 bg-white dark:bg-[#121214] p-6 shadow-xs ${
+              className={`relative flex flex-col justify-between rounded-2xl border transition-all duration-200 bg-white dark:bg-[#10131a] p-6 shadow-2xs ${
                 isActualFleetMatch
-                  ? 'border-amber-500 dark:border-amber-500 ring-2 ring-amber-500/20 shadow-md'
-                  : 'border-slate-200 dark:border-neutral-800 hover:border-slate-300 dark:hover:border-neutral-700'
+                  ? 'border-blue-600 dark:border-blue-500 ring-2 ring-blue-500/20 shadow-md'
+                  : 'border-slate-200/90 dark:border-neutral-800/80 hover:border-slate-300'
               }`}
             >
               {/* Top Badges */}
-              <div className="flex flex-wrap items-center justify-between gap-1.5 mb-4">
-                <div className="flex items-center space-x-1.5">
-                  {tier.isPopular && (
-                    <span className="px-2.5 py-0.5 bg-amber-500 text-slate-950 font-mono text-[10px] font-bold rounded-full uppercase tracking-wider shadow-2xs">
-                      Most Popular
-                    </span>
-                  )}
-                  {isCurrentPlan && (
-                    <span className="px-2 py-0.5 bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30 font-mono text-[10px] font-bold rounded-full uppercase">
-                      Current Plan
+              <div>
+                <div className="flex flex-wrap items-center justify-between gap-1.5 mb-3">
+                  <div className="flex items-center space-x-1.5">
+                    {tier.isPopular && (
+                      <span className="px-2.5 py-0.5 bg-blue-600 text-white font-mono text-[10px] font-bold rounded-full uppercase tracking-wider">
+                        Most Popular
+                      </span>
+                    )}
+                    {isCurrentPlan && (
+                      <span className="px-2.5 py-0.5 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 font-mono text-[10px] font-bold rounded-full uppercase">
+                        Current Plan
+                      </span>
+                    )}
+                  </div>
+
+                  {isActualFleetMatch && (
+                    <span className="px-2.5 py-0.5 bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/60 font-mono text-[10px] font-bold rounded-full flex items-center space-x-1">
+                      <Sparkles className="w-2.5 h-2.5" />
+                      <span>Fleet Match</span>
                     </span>
                   )}
                 </div>
 
-                {/* Fleet Match Indicator */}
-                {isActualFleetMatch && (
-                  <span className="px-2 py-0.5 bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-800/60 font-mono text-[10px] font-bold rounded-md flex items-center space-x-1">
-                    <Sparkles className="w-2.5 h-2.5 text-amber-600 dark:text-amber-400" />
-                    <span>Your Fleet Match</span>
-                  </span>
-                )}
-              </div>
-
-              {/* Tier Title & Description */}
-              <div>
+                {/* Tier Title */}
                 <div className="flex items-baseline justify-between">
-                  <h3 className="text-xl font-extrabold text-slate-900 dark:text-neutral-100 font-sans tracking-tight">
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white font-sans tracking-tight">
                     {tier.name}
                   </h3>
                   <span className="text-xs font-mono font-semibold text-slate-500 dark:text-neutral-400">
@@ -358,20 +339,20 @@ export const SubscriptionView: React.FC<SubscriptionViewProps> = ({
                   {tier.tagline}
                 </p>
 
-                {/* Fixed Per-Bus Rate (Read-Only) */}
-                <div className="mt-5 p-3.5 bg-slate-50 dark:bg-neutral-900/80 border border-slate-100 dark:border-neutral-800 rounded-lg space-y-1">
+                {/* Fixed Rate */}
+                <div className="mt-4 p-3.5 bg-slate-50 dark:bg-neutral-900 border border-slate-100 dark:border-neutral-800 rounded-xl space-y-1">
                   <div className="flex items-center justify-between text-[11px] font-mono text-slate-500 dark:text-neutral-400">
                     <span className="flex items-center space-x-1">
                       <Lock className="w-3 h-3 text-slate-400" />
-                      <span>Fixed Platform Rate</span>
+                      <span>Platform Rate</span>
                     </span>
                     <span className="text-[10px] uppercase font-semibold text-slate-400">
-                      Set by Admin
+                      Standard
                     </span>
                   </div>
 
                   <div className="flex items-baseline space-x-1.5">
-                    <span className="text-2xl font-black font-mono text-slate-900 dark:text-neutral-100">
+                    <span className="text-2xl font-black font-mono text-slate-900 dark:text-white">
                       ₹{ratePerBus.toLocaleString('en-IN')}
                     </span>
                     <span className="text-xs font-mono text-slate-500 dark:text-neutral-400">
@@ -380,25 +361,25 @@ export const SubscriptionView: React.FC<SubscriptionViewProps> = ({
                   </div>
                 </div>
 
-                {/* Estimated Total Monthly Cost Calculation (Requirement 2) */}
-                <div className="mt-4 pt-4 border-t border-slate-100 dark:border-neutral-800/80">
-                  <div className="text-[10px] font-mono uppercase tracking-wider text-slate-400 dark:text-neutral-500 font-semibold mb-1">
-                    Estimated Cost for {calculatorBusCount} {calculatorBusCount === 1 ? 'Bus' : 'Buses'}
+                {/* Estimated Total for selected bus count */}
+                <div className="mt-4 pt-3 border-t border-slate-100 dark:border-neutral-800">
+                  <div className="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-semibold mb-1">
+                    Cost for {calculatorBusCount} {calculatorBusCount === 1 ? 'Bus' : 'Buses'}
                   </div>
 
                   {tier.isContactSales ? (
                     <div>
-                      <div className="text-xl font-extrabold font-sans text-slate-900 dark:text-neutral-100 tracking-tight">
-                        Contact Sales
+                      <div className="text-lg font-bold font-sans text-slate-900 dark:text-white">
+                        Custom Enterprise Terms
                       </div>
                       <div className="text-[11px] font-mono text-slate-500 dark:text-neutral-400 mt-0.5">
-                        Volume terms starting from ₹{(calculatorBusCount * ratePerBus).toLocaleString('en-IN')}/mo
+                        Volume starting from ₹{(calculatorBusCount * ratePerBus).toLocaleString('en-IN')}/mo
                       </div>
                     </div>
                   ) : (
                     <div>
                       <div className="flex items-baseline space-x-1.5">
-                        <span className="text-2xl font-black font-mono text-amber-600 dark:text-amber-400">
+                        <span className="text-2xl font-black font-mono text-blue-600 dark:text-blue-400">
                           ₹{estimatedMonthlyCost.toLocaleString('en-IN')}
                         </span>
                         <span className="text-xs font-mono text-slate-500 dark:text-neutral-400">
@@ -413,11 +394,11 @@ export const SubscriptionView: React.FC<SubscriptionViewProps> = ({
                 </div>
 
                 {/* Features List */}
-                <div className="mt-6 space-y-2.5">
-                  <div className="text-[11px] font-mono uppercase tracking-wider text-slate-400 dark:text-neutral-500 font-bold">
-                    What's Included:
+                <div className="mt-5 space-y-2">
+                  <div className="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-bold">
+                    Included Capabilities:
                   </div>
-                  <ul className="space-y-2 text-xs font-sans text-slate-600 dark:text-neutral-300">
+                  <ul className="space-y-1.5 text-xs font-sans text-slate-600 dark:text-neutral-300">
                     {tier.features.map((feature, fIdx) => (
                       <li key={fIdx} className="flex items-start space-x-2">
                         <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
@@ -428,13 +409,13 @@ export const SubscriptionView: React.FC<SubscriptionViewProps> = ({
                 </div>
               </div>
 
-              {/* Action Button (Requirement 4) */}
-              <div className="mt-8 pt-4 border-t border-slate-100 dark:border-neutral-800/80">
+              {/* Action Button */}
+              <div className="mt-6 pt-4 border-t border-slate-100 dark:border-neutral-800">
                 {tier.isContactSales ? (
                   <button
                     type="button"
                     onClick={() => setContactSalesModalOpen(true)}
-                    className="w-full py-2.5 px-4 bg-slate-900 hover:bg-slate-800 dark:bg-neutral-100 dark:hover:bg-white text-white dark:text-slate-900 text-xs font-mono font-bold rounded-lg transition-colors flex items-center justify-center space-x-2 cursor-pointer shadow-xs"
+                    className="w-full py-2.5 px-4 bg-slate-900 hover:bg-slate-800 dark:bg-neutral-100 dark:hover:bg-white text-white dark:text-slate-900 text-xs font-mono font-bold rounded-xl transition-colors flex items-center justify-center space-x-2 cursor-pointer shadow-xs"
                   >
                     <PhoneCall className="w-3.5 h-3.5" />
                     <span>Contact Sales</span>
@@ -443,9 +424,9 @@ export const SubscriptionView: React.FC<SubscriptionViewProps> = ({
                   <button
                     type="button"
                     disabled
-                    className="w-full py-2.5 px-4 bg-emerald-500/10 border border-emerald-500/30 text-emerald-800 dark:text-emerald-300 text-xs font-mono font-bold rounded-lg flex items-center justify-center space-x-2 cursor-default"
+                    className="w-full py-2.5 px-4 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-xs font-mono font-bold rounded-xl flex items-center justify-center space-x-2 cursor-default"
                   >
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                     <span>Current Active Plan</span>
                   </button>
                 ) : (
@@ -453,27 +434,21 @@ export const SubscriptionView: React.FC<SubscriptionViewProps> = ({
                     type="button"
                     onClick={() => handleSelectPlan(tier)}
                     disabled={selectingTierId === tier.id}
-                    className={`w-full py-2.5 px-4 text-xs font-mono font-bold rounded-lg transition-colors flex items-center justify-center space-x-2 cursor-pointer shadow-xs ${
+                    className={`w-full py-2.5 px-4 text-xs font-mono font-bold rounded-xl transition-colors flex items-center justify-center space-x-2 cursor-pointer shadow-xs ${
                       isActualFleetMatch
-                        ? 'bg-amber-500 hover:bg-amber-600 text-slate-950'
-                        : 'bg-slate-100 dark:bg-neutral-800 hover:bg-slate-200 dark:hover:bg-neutral-700 text-slate-900 dark:text-neutral-100 border border-slate-200 dark:border-neutral-700'
+                        ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-500/20 shadow-md'
+                        : 'bg-slate-100 dark:bg-neutral-800 hover:bg-slate-200 text-slate-900 dark:text-white border border-slate-200 dark:border-neutral-700'
                     }`}
                   >
                     {selectingTierId === tier.id ? (
                       <span>Updating Plan...</span>
                     ) : (
                       <>
-                        <span>Select {tier.name} Plan</span>
+                        <span>Select {tier.name}</span>
                         <ArrowRight className="w-3.5 h-3.5" />
                       </>
                     )}
                   </button>
-                )}
-
-                {isActualFleetMatch && !isCurrentPlan && (
-                  <p className="text-[10px] font-mono text-center text-amber-700 dark:text-amber-400 mt-2 font-medium">
-                    Recommended for your current fleet of {actualFleetCount} buses
-                  </p>
                 )}
               </div>
             </div>
@@ -481,79 +456,66 @@ export const SubscriptionView: React.FC<SubscriptionViewProps> = ({
         })}
       </div>
 
-      {/* Transparency Note */}
-      <div className="p-4 bg-slate-50 dark:bg-neutral-900/60 border border-slate-200 dark:border-neutral-800 rounded-xl flex items-start space-x-3">
-        <ShieldCheck className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-        <div className="text-xs font-sans text-slate-600 dark:text-neutral-400 space-y-1">
-          <p className="font-bold text-slate-900 dark:text-neutral-200 font-mono">
-            Platform Rate Policy & Billing Cycle
-          </p>
-          <p>
-            Per-bus subscription rates are centrally maintained by Tranzit platform administrators. When your fleet expands or contracts, your tier qualification adjusts automatically to guarantee the best available volume rate.
-          </p>
-        </div>
-      </div>
-
-      {/* Enterprise Contact Sales Modal */}
+      {/* SECTION 4: ENTERPRISE CONTACT SALES MODAL */}
       {contactSalesModalOpen && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#121214] border border-slate-200 dark:border-neutral-800 rounded-xl max-w-md w-full p-6 shadow-2xl space-y-4">
+          <div className="bg-white dark:bg-[#10131a] border border-slate-200/90 dark:border-neutral-800/80 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150 text-slate-900 dark:text-white">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-neutral-800 pb-3">
               <div className="flex items-center space-x-2">
-                <PhoneCall className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                <h3 className="text-base font-bold font-sans text-slate-900 dark:text-neutral-100">
+                <PhoneCall className="w-4 h-4 text-blue-600" />
+                <h3 className="text-base font-bold font-sans">
                   Enterprise Fleet Inquiry
                 </h3>
               </div>
               <button
                 onClick={() => setContactSalesModalOpen(false)}
-                className="p-1 text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer"
+                className="p-1.5 text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-xl cursor-pointer"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
             {salesMessageSent ? (
               <div className="py-6 text-center space-y-2">
                 <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto" />
-                <h4 className="text-sm font-bold font-mono text-slate-900 dark:text-neutral-100">
+                <h4 className="text-sm font-bold font-mono text-slate-900 dark:text-white">
                   Inquiry Received!
                 </h4>
                 <p className="text-xs text-slate-500 dark:text-neutral-400">
-                  Our regional enterprise director will reach out to <span className="font-mono font-bold text-slate-900 dark:text-neutral-200">{owner.email}</span> within 24 business hours.
+                  Our regional enterprise director will reach out to <span className="font-mono font-bold text-slate-900 dark:text-white">{owner.email}</span> within 24 business hours.
                 </p>
               </div>
             ) : (
               <div className="space-y-4">
-                <p className="text-xs text-slate-600 dark:text-neutral-400">
-                  For fleets with 21+ buses, we offer tailored SLAs, dedicated GPS telematics integrations, and volume pricing starting at ₹{pricing.enterpriseRate}/bus/month.
+                <p className="text-xs text-slate-600 dark:text-neutral-400 leading-relaxed font-sans">
+                  For fleets with 21+ buses, we offer dedicated SLAs, GPS telematics integrations, and volume pricing starting at ₹{pricing.enterpriseRate}/bus/month.
                 </p>
 
                 <div className="space-y-2 text-xs font-mono">
-                  <div className="flex justify-between py-1.5 px-3 bg-slate-50 dark:bg-neutral-900 rounded border border-slate-200 dark:border-neutral-800">
+                  <div className="flex justify-between py-2 px-3 bg-slate-50 dark:bg-neutral-900 rounded-xl border border-slate-200 dark:border-neutral-800">
                     <span className="text-slate-400">Operator:</span>
-                    <span className="font-bold text-slate-900 dark:text-neutral-100">{owner.companyName || owner.name}</span>
+                    <span className="font-bold">{owner.companyName || owner.name}</span>
                   </div>
-                  <div className="flex justify-between py-1.5 px-3 bg-slate-50 dark:bg-neutral-900 rounded border border-slate-200 dark:border-neutral-800">
+                  <div className="flex justify-between py-2 px-3 bg-slate-50 dark:bg-neutral-900 rounded-xl border border-slate-200 dark:border-neutral-800">
                     <span className="text-slate-400">Active Fleet:</span>
-                    <span className="font-bold text-slate-900 dark:text-neutral-100">{actualFleetCount} Buses</span>
+                    <span className="font-bold">{actualFleetCount} Buses</span>
                   </div>
-                  <div className="flex justify-between py-1.5 px-3 bg-slate-50 dark:bg-neutral-900 rounded border border-slate-200 dark:border-neutral-800">
+                  <div className="flex justify-between py-2 px-3 bg-slate-50 dark:bg-neutral-900 rounded-xl border border-slate-200 dark:border-neutral-800">
                     <span className="text-slate-400">Email:</span>
-                    <span className="font-bold text-slate-900 dark:text-neutral-100">{owner.email}</span>
+                    <span className="font-bold">{owner.email}</span>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-mono text-slate-700 dark:text-neutral-300 font-semibold mb-1">
-                    Depot Requirements or Notes (Optional)
+                  <label className="block text-xs font-mono uppercase text-slate-600 dark:text-neutral-400 font-bold mb-1">
+                    Fleet Requirements or Notes
                   </label>
                   <textarea
                     rows={3}
                     value={salesNote}
                     onChange={(e) => setSalesNote(e.target.value)}
-                    placeholder="E.g. We have 32 intercity sleeper coaches across Karnataka and Maharashtra routes."
-                    className="w-full px-3 py-2 text-xs font-sans border border-slate-200 dark:border-neutral-700 rounded-lg bg-slate-50 dark:bg-neutral-900 text-slate-900 dark:text-neutral-100 focus:outline-hidden focus:border-amber-500"
+                    placeholder="E.g. We operate 35 intercity sleeper coaches across Karnataka."
+                    className="w-full px-3 py-2 text-xs font-sans border border-slate-200 dark:border-neutral-800 rounded-xl bg-slate-50 dark:bg-neutral-900 text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
                   />
                 </div>
 
@@ -561,16 +523,16 @@ export const SubscriptionView: React.FC<SubscriptionViewProps> = ({
                   <button
                     type="button"
                     onClick={() => setContactSalesModalOpen(false)}
-                    className="px-3 py-1.5 text-xs font-mono text-slate-600 dark:text-neutral-400 hover:bg-slate-100 dark:hover:bg-neutral-800 rounded-lg cursor-pointer"
+                    className="px-3.5 py-2 text-xs font-mono font-bold text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white rounded-xl cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="button"
                     onClick={handleSendContactSales}
-                    className="px-4 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-mono text-xs font-bold rounded-lg transition-colors cursor-pointer"
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-mono text-xs font-bold rounded-xl transition-colors cursor-pointer shadow-md shadow-blue-500/20"
                   >
-                    Submit Enterprise Request
+                    Submit Inquiry
                   </button>
                 </div>
               </div>

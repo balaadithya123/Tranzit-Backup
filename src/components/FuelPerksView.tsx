@@ -3,7 +3,8 @@ import { OwnerProfile, Bus } from '../types';
 import { collection, query, where, onSnapshot, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { formatINR } from '../lib/utils';
-import { Sparkles, Fuel, Award, Clock, RefreshCw, ShieldCheck, UserCheck } from 'lucide-react';
+import { Sparkles, Fuel, Award, Clock, RefreshCw, ShieldCheck, UserCheck, Flame, Zap } from 'lucide-react';
+import { StatCard } from './StatCard';
 
 interface FuelPerksViewProps {
   owner: OwnerProfile;
@@ -88,99 +89,62 @@ export const FuelPerksView: React.FC<FuelPerksViewProps> = ({ owner }) => {
   const avgFuelRating = buses.length > 0 ? Math.round(buses.reduce((acc, b) => acc + (b.fuelEfficiencyScore || 0), 0) / buses.length) : 0;
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="bg-white dark:bg-[#121214] border border-slate-200 dark:border-neutral-800 p-5 sm:p-6 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xs transition-colors">
+    <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-300">
+      {/* SECTION 1: HEADER & ACTIONS */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-slate-200/80 dark:border-neutral-800">
         <div>
-          <div className="flex items-center space-x-2 text-xs font-mono text-amber-700 dark:text-amber-400 uppercase tracking-widest mb-1.5 font-bold">
-            <Fuel className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-            <span>Driver Perks</span>
+          <div className="flex items-center space-x-2">
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-sans tracking-tight">
+              Fuel Rewards & Pilot Incentives
+            </h1>
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-400 border border-amber-200 dark:border-amber-800 flex items-center space-x-1">
+              <Sparkles className="w-3 h-3" />
+              <span>AI Automated</span>
+            </span>
           </div>
-          <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-neutral-100 tracking-tight flex items-center space-x-2 font-sans">
-            <span>Fuel & Driver Perks</span>
-          </h2>
-          <p className="text-xs text-slate-500 dark:text-neutral-400 font-sans mt-0.5">
-            Driver incentive scoring based on on-time performance and fuel efficiency.
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-neutral-400 mt-1">
+            Performance scoring, eco-driving fuel credits, and Gemini-evaluated driver rewards.
           </p>
         </div>
-
-        <div className="flex items-center space-x-2">
-          <span className="px-3 py-1.5 bg-amber-50 dark:bg-amber-950/30 text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-800/60 font-mono text-xs font-bold rounded-lg flex items-center space-x-1.5 shadow-2xs">
-            <Sparkles className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-            <span>AI Scored</span>
-          </span>
-        </div>
       </div>
 
-      {/* 3 Key Metrics Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Total Monthly Incentive Pool */}
-        <div className="bg-white dark:bg-[#121214] border border-slate-200 dark:border-neutral-800 border-l-4 border-l-amber-600 p-5 rounded-xl shadow-xs transition-colors">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-mono uppercase font-bold text-slate-500 dark:text-neutral-400">
-              Incentive Pool
-            </span>
-            <Award className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-          </div>
-          <div className="text-2xl font-mono font-bold text-slate-900 dark:text-neutral-100">
-            {formatINR(totalIncentiveBudget)}
-          </div>
-          <div className="text-[11px] font-mono text-amber-800 dark:text-amber-400 mt-1">
-            {buses.length} registered drivers
-          </div>
-        </div>
-
-        {/* Fleet On-Time Performance */}
-        <div className="bg-white dark:bg-[#121214] border border-slate-200 dark:border-neutral-800 border-l-4 border-l-emerald-600 p-5 rounded-xl shadow-xs transition-colors">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-mono uppercase font-bold text-slate-500 dark:text-neutral-400">
-              Avg On-Time
-            </span>
-            <Clock className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-          </div>
-          <div className="text-2xl font-mono font-bold text-slate-900 dark:text-neutral-100">
-            {avgOnTime}%
-          </div>
-          <div className="text-[11px] font-mono text-emerald-800 dark:text-emerald-400 mt-1">
-            Fleet punctuality benchmark
-          </div>
-        </div>
-
-        {/* Fleet Fuel Efficiency Score */}
-        <div className="bg-white dark:bg-[#121214] border border-slate-200 dark:border-neutral-800 border-l-4 border-l-teal-600 p-5 rounded-xl shadow-xs transition-colors">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-mono uppercase font-bold text-slate-500 dark:text-neutral-400">
-              Fuel Efficiency
-            </span>
-            <Fuel className="w-4 h-4 text-teal-600 dark:text-teal-400" />
-          </div>
-          <div className="text-2xl font-mono font-bold text-slate-900 dark:text-neutral-100">
-            {avgFuelRating} / 100
-          </div>
-          <div className="text-[11px] font-mono text-teal-800 dark:text-teal-400 mt-1">
-            Eco-driving compliance score
-          </div>
-        </div>
+      {/* SECTION 2: STAT CARDS */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <StatCard
+          label="Total Monthly Incentive Pool"
+          value={formatINR(totalIncentiveBudget)}
+          subtext={`${buses.length} active pilots eligible for reward payouts`}
+          icon={Award}
+        />
+        <StatCard
+          label="Fleet Punctuality Rating"
+          value={`${avgOnTime}%`}
+          subtext="Corridor schedule compliance benchmark"
+          icon={Clock}
+        />
+        <StatCard
+          label="Eco-Driving Efficiency Score"
+          value={`${avgFuelRating} / 100`}
+          subtext="Calculated from real-time speed & idle telemetry"
+          icon={Fuel}
+        />
       </div>
 
-      {/* Drivers List & AI Incentive Rationales */}
-      <div className="bg-white dark:bg-[#121214] border border-slate-200 dark:border-neutral-800 rounded-xl overflow-hidden shadow-xs transition-colors">
-        <div className="p-4 border-b border-slate-200 dark:border-neutral-800 bg-slate-50/70 dark:bg-neutral-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+      {/* SECTION 3: DRIVERS ROSTER & AI INCENTIVES */}
+      <div className="bg-white dark:bg-[#10131a] border border-slate-200/90 dark:border-neutral-800/80 rounded-2xl p-4 sm:p-5 shadow-2xs space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-neutral-800">
           <div className="flex items-center space-x-2">
-            <UserCheck className="w-4 h-4 text-slate-700 dark:text-neutral-300" />
-            <span className="text-xs font-mono uppercase font-bold text-slate-800 dark:text-neutral-200">
-              Driver Roster ({buses.length})
-            </span>
+            <UserCheck className="w-4 h-4 text-blue-600" />
+            <h3 className="font-bold text-sm text-slate-900 dark:text-white font-sans">
+              Driver Roster & Monthly Telemetry ({buses.length})
+            </h3>
           </div>
-          <div className="text-[11px] font-mono text-amber-900 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/30 px-2.5 py-1 rounded-md border border-amber-200 dark:border-amber-800/60 flex items-center space-x-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-            <span>AI Incentive scoring</span>
-          </div>
+          <span className="text-[11px] font-mono text-slate-400">Realtime GPS & Fuel Sync</span>
         </div>
 
         <div className="divide-y divide-slate-100 dark:divide-neutral-800">
           {buses.map((bus) => {
-            const driverName = bus.driverName || (bus.id === 'bus-saas-1' ? 'Ramesh Kumar' : bus.id === 'bus-saas-2' ? 'Siddharth Gowda' : 'Manjunath Naidu');
+            const driverName = bus.driverName || 'Prakash Rao';
             const onTime = bus.onTimePercent || 94;
             const fuelScore = bus.fuelEfficiencyScore || 92;
             const credit = bus.fuelIncentiveCredit || 2000;
@@ -188,82 +152,64 @@ export const FuelPerksView: React.FC<FuelPerksViewProps> = ({ owner }) => {
             const liveRationale = rationales[bus.id];
 
             return (
-              <div key={bus.id} className="p-5 hover:bg-slate-50/70 dark:hover:bg-neutral-900/40 transition-colors">
+              <div key={bus.id} className="py-4.5 first:pt-0 last:pb-0 hover:bg-slate-50/50 dark:hover:bg-neutral-900/30 transition-colors rounded-xl p-2">
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                  
-                  {/* Left: Driver & Bus Info */}
-                  <div className="flex items-start space-x-4">
-                    <div className="w-10 h-10 bg-slate-900 dark:bg-neutral-800 text-white dark:text-neutral-100 flex items-center justify-center font-extrabold text-sm rounded-lg flex-shrink-0 border border-slate-700 dark:border-neutral-700">
-                      {driverName.split(' ').map(n => n[0]).join('')}
+                  {/* Left info */}
+                  <div className="flex items-start space-x-3.5">
+                    <div className="w-10 h-10 bg-slate-900 dark:bg-neutral-800 text-white font-mono font-black text-sm flex items-center justify-center rounded-xl shrink-0 border border-slate-800 dark:border-neutral-700">
+                      {driverName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
                     </div>
 
                     <div>
                       <div className="flex items-center space-x-2">
-                        <h4 className="text-sm font-extrabold text-slate-900 dark:text-neutral-100">
+                        <h4 className="text-sm font-bold text-slate-900 dark:text-white font-sans">
                           {driverName}
                         </h4>
-                        <span className="text-[10px] font-mono bg-slate-100 dark:bg-neutral-900 text-slate-700 dark:text-neutral-300 px-2 py-0.5 rounded-md border border-slate-200 dark:border-neutral-800">
+                        <span className="px-2 py-0.5 bg-slate-100 dark:bg-neutral-800 text-slate-700 dark:text-neutral-300 font-mono text-[10px] font-bold rounded-md">
                           {bus.regNumber}
                         </span>
                       </div>
                       <p className="text-xs text-slate-500 dark:text-neutral-400 font-sans mt-0.5">
-                        Assigned Bus: <strong>{bus.model}</strong> • Route: <strong>{bus.routeAssigned}</strong>
+                        Corridor: <strong>{bus.routeAssigned || 'Unassigned'}</strong> • Vehicle: <strong>{bus.model}</strong>
                       </p>
                     </div>
                   </div>
 
-                  {/* Middle: Performance Metrics Pills */}
-                  <div className="flex flex-wrap items-center gap-3 font-mono text-xs">
-                    <div className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-lg text-emerald-900 dark:text-emerald-300">
-                      <span className="text-[10px] uppercase block text-emerald-700 dark:text-emerald-400 font-semibold">On-Time Rate</span>
-                      <strong className="text-sm font-bold">{onTime}%</strong>
+                  {/* Middle metrics */}
+                  <div className="flex flex-wrap items-center gap-2.5 font-mono text-xs">
+                    <div className="px-3 py-1 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-xl text-emerald-800 dark:text-emerald-300">
+                      <span className="text-[9px] uppercase block text-emerald-600 font-bold">On-Time</span>
+                      <strong className="text-xs font-bold">{onTime}%</strong>
                     </div>
 
-                    <div className="px-3 py-1.5 bg-teal-50 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800/60 rounded-lg text-teal-900 dark:text-teal-300">
-                      <span className="text-[10px] uppercase block text-teal-700 dark:text-teal-400 font-semibold">Fuel Score</span>
-                      <strong className="text-sm font-bold">{fuelScore} / 100</strong>
+                    <div className="px-3 py-1 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60 rounded-xl text-blue-800 dark:text-blue-300">
+                      <span className="text-[9px] uppercase block text-blue-600 font-bold">Fuel Score</span>
+                      <strong className="text-xs font-bold">{fuelScore}/100</strong>
                     </div>
 
-                    <div className="px-3 py-1.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-lg text-amber-950 dark:text-amber-200">
-                      <span className="text-[10px] uppercase block text-amber-800 dark:text-amber-400 font-semibold">Fuel Credit</span>
-                      <strong className="text-sm font-bold text-amber-900 dark:text-amber-300">{formatINR(credit)}</strong>
-                    </div>
-
-                    <div className="px-3 py-1.5 bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-lg text-slate-700 dark:text-neutral-300 flex items-center space-x-1.5">
-                      <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
-                      <div className="text-left">
-                        <span className="text-[10px] uppercase block text-slate-500 dark:text-neutral-400 font-semibold tracking-wider">Metrics Audit</span>
-                        <span className="text-[11px] font-mono font-bold text-slate-800 dark:text-neutral-200">Verified by Tranzit</span>
-                      </div>
+                    <div className="px-3 py-1 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-xl text-amber-800 dark:text-amber-300">
+                      <span className="text-[9px] uppercase block text-amber-600 font-bold">Perk Credit</span>
+                      <strong className="text-xs font-bold">{formatINR(credit)}</strong>
                     </div>
                   </div>
-
                 </div>
 
-                {/* Gemini AI Generated Incentive Rationale Callout */}
-                <div className="mt-4 p-3.5 bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/60 rounded-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                  <div className="flex items-start space-x-2.5">
-                    <div className="p-1.5 bg-amber-500 text-white rounded-lg mt-0.5 flex-shrink-0">
-                      <Sparkles className="w-4 h-4" />
-                    </div>
+                {/* AI Rationale box */}
+                <div className="mt-3 p-3 bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-800/40 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+                  <div className="flex items-start space-x-2">
+                    <Sparkles className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                     <div>
-                      <div className="flex items-center space-x-2 mb-0.5">
-                        <span className="text-[11px] font-mono font-extrabold text-amber-950 dark:text-amber-200 uppercase tracking-wider">
-                          AI Incentive Rationale (Gemini Live API)
-                        </span>
-                        <span className="text-[10px] font-mono bg-white dark:bg-neutral-900 text-amber-900 dark:text-amber-300 px-1.5 py-0.2 rounded border border-amber-300 dark:border-neutral-700">
-                          {isGenerating ? 'Computing...' : 'Verified Live'}
-                        </span>
+                      <div className="flex items-center space-x-1.5 font-mono text-[10px] text-amber-900 dark:text-amber-300 font-bold uppercase">
+                        <span>AI Performance Assessment</span>
                       </div>
-                      
                       {isGenerating ? (
-                        <div className="flex items-center space-x-2 text-xs font-mono text-amber-800 dark:text-amber-300 py-0.5 animate-pulse">
-                          <RefreshCw className="w-3.5 h-3.5 animate-spin text-amber-600 dark:text-amber-400" />
-                          <span>Gemini is analyzing driver on-time % and fuel efficiency scores from Firestore...</span>
+                        <div className="flex items-center space-x-2 text-slate-500 text-xs font-mono mt-0.5">
+                          <RefreshCw className="w-3 h-3 animate-spin text-amber-600" />
+                          <span>Generating driver incentive analysis...</span>
                         </div>
                       ) : (
-                        <p className="text-xs text-amber-950 dark:text-amber-100 font-sans font-medium leading-relaxed">
-                          "{liveRationale || `${onTime}% on-time performance and ${fuelScore}/100 fuel efficiency — eligible for the full ${formatINR(credit)} credit this month.`}"
+                        <p className="text-slate-700 dark:text-neutral-300 mt-0.5 leading-relaxed font-sans text-xs">
+                          {liveRationale || `${onTime}% punctuality record with optimal idling habits — authorized for full ₹${credit.toLocaleString('en-IN')} incentive.`}
                         </p>
                       )}
                     </div>
@@ -272,14 +218,12 @@ export const FuelPerksView: React.FC<FuelPerksViewProps> = ({ owner }) => {
                   <button
                     onClick={() => fetchGeminiRationale(bus)}
                     disabled={isGenerating}
-                    className="px-2.5 py-1.5 bg-white dark:bg-neutral-900 hover:bg-amber-100 dark:hover:bg-neutral-800 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-neutral-700 text-[11px] font-mono font-bold uppercase rounded-lg transition-colors flex items-center space-x-1 whitespace-nowrap cursor-pointer self-start sm:self-auto shadow-2xs"
-                    title="Regenerate Gemini AI rationale"
+                    className="px-2.5 py-1 bg-white dark:bg-neutral-900 hover:bg-slate-50 dark:hover:bg-neutral-800 text-slate-700 dark:text-neutral-200 border border-slate-200 dark:border-neutral-800 font-mono text-[10px] font-bold rounded-lg cursor-pointer shrink-0 transition-colors flex items-center space-x-1"
                   >
-                    <RefreshCw className={`w-3 h-3 text-amber-600 dark:text-amber-400 ${isGenerating ? 'animate-spin' : ''}`} />
+                    <RefreshCw className={`w-3 h-3 ${isGenerating ? 'animate-spin' : ''}`} />
                     <span>Re-evaluate</span>
                   </button>
                 </div>
-
               </div>
             );
           })}

@@ -174,59 +174,59 @@ export const DriversView: React.FC<DriversViewProps> = ({ owner }) => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* View Header */}
-      <div className="bg-white dark:bg-[#121214] border border-slate-200 dark:border-neutral-800 p-5 sm:p-6 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs transition-colors">
+    <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-300">
+      {/* SECTION 1: HEADER & ACTIONS */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-slate-200/80 dark:border-neutral-800">
         <div>
-          <div className="flex items-center space-x-2 text-xs font-mono text-slate-500 dark:text-neutral-400 uppercase tracking-widest mb-1.5 font-bold">
-            <Users className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-            <span>Drivers</span>
+          <div className="flex items-center space-x-2">
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-sans tracking-tight">
+              Fleet Pilots & Roster Management
+            </h1>
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
+              {totalDrivers} Pilots
+            </span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-neutral-100 tracking-tight font-sans">
-            Drivers & Roster
-          </h1>
-          <p className="text-xs text-slate-500 dark:text-neutral-400 font-sans mt-0.5">
-            Driver profiles, license validity, and assigned routes.
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-neutral-400 mt-1">
+            Commercial DL compliance, duty roster assignments, safety scores, and relief pilot standby pool.
           </p>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex items-center space-x-2.5 self-start sm:self-auto">
+        <div className="flex items-center space-x-2.5 self-start md:self-auto">
           <button
             onClick={handlePrintRoster}
-            className="px-3 py-2 bg-white dark:bg-neutral-900 hover:bg-slate-50 dark:hover:bg-neutral-800 border border-slate-200 dark:border-neutral-800 text-slate-700 dark:text-neutral-300 font-mono font-bold text-xs uppercase rounded-lg transition-colors flex items-center space-x-1.5 cursor-pointer shadow-2xs"
+            className="px-3.5 py-2 bg-white dark:bg-neutral-900 hover:bg-slate-50 dark:hover:bg-neutral-800 border border-slate-200 dark:border-neutral-800 text-slate-700 dark:text-neutral-200 text-xs font-mono font-bold rounded-xl transition-colors flex items-center space-x-1.5 cursor-pointer shadow-2xs"
             title="Print or export driver manifest"
           >
-            <Printer className="w-3.5 h-3.5 text-slate-500 dark:text-neutral-400" />
-            <span>Print</span>
+            <Printer className="w-3.5 h-3.5 text-slate-400" />
+            <span>Print Manifest</span>
           </button>
 
           <button
             onClick={() => setIsAddModalOpen(true)}
-            className="px-4 py-2 bg-slate-900 hover:bg-slate-800 dark:bg-amber-600 dark:hover:bg-amber-700 text-white dark:text-slate-950 font-mono font-bold text-xs uppercase tracking-wider rounded-lg transition-colors flex items-center space-x-2 cursor-pointer shadow-xs"
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-mono font-bold rounded-xl transition-colors flex items-center space-x-1.5 cursor-pointer shadow-md shadow-blue-500/20"
           >
-            <Plus className="w-4 h-4 text-amber-400 dark:text-slate-950" />
-            <span>Add Driver</span>
+            <Plus className="w-4 h-4" />
+            <span>Enroll Pilot</span>
           </button>
         </div>
       </div>
 
-      {/* License Expiry Alert Banner (if urgent) */}
+      {/* SECTION 2: LICENSE EXPIRY ALERT BANNER (If urgent) */}
       {urgentDrivers.length > 0 && (
-        <div className="p-4 bg-amber-50 dark:bg-amber-950/30 border-l-4 border-amber-600 border border-amber-200 dark:border-amber-800/60 rounded-xl shadow-2xs">
+        <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 rounded-2xl p-4 sm:p-5 shadow-2xs">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-start space-x-3">
-              <div className="p-1.5 bg-amber-500/20 text-amber-800 dark:text-amber-300 rounded-lg mt-0.5">
-                <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+              <div className="p-2.5 bg-amber-500/20 text-amber-800 dark:text-amber-300 rounded-xl mt-0.5 shrink-0">
+                <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 animate-pulse" />
               </div>
               <div>
-                <h2 className="text-sm font-extrabold text-amber-950 dark:text-amber-200 font-mono uppercase tracking-wide">
-                  Commercial License Renewal Required ({urgentDrivers.length} {urgentDrivers.length === 1 ? 'Driver' : 'Drivers'})
-                </h2>
-                <p className="text-xs text-amber-900 dark:text-amber-300 font-sans mt-0.5">
-                  Under the Motor Vehicles Act, operating public transport without an active HMV/PSV badge invalidates insurance coverage.
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white font-sans">
+                  Commercial DL Renewal Action Required ({urgentDrivers.length} {urgentDrivers.length === 1 ? 'Pilot' : 'Pilots'})
+                </h3>
+                <p className="text-xs text-slate-600 dark:text-neutral-300 mt-0.5 leading-relaxed font-sans">
+                  Under Section 3 & 14 of the Motor Vehicles Act, operating public transport without an active HMV/PSV badge invalidates insurance coverage.
                 </p>
-                <div className="flex flex-wrap gap-2 mt-2">
+                <div className="flex flex-wrap gap-2 mt-2.5">
                   {urgentDrivers.map(({ driver, validity }) => (
                     <button
                       key={driver.id}
@@ -243,7 +243,7 @@ export const DriversView: React.FC<DriversViewProps> = ({ owner }) => {
             </div>
             <button
               onClick={() => setLicenseFilter('expiring')}
-              className="self-start sm:self-center px-3 py-1.5 bg-amber-700 hover:bg-amber-800 text-white font-mono text-xs font-bold uppercase rounded-lg transition-colors cursor-pointer shrink-0"
+              className="self-start sm:self-center px-3.5 py-1.5 bg-amber-600 hover:bg-amber-500 text-white font-mono text-xs font-bold rounded-xl transition-colors cursor-pointer shrink-0 shadow-xs"
             >
               Filter Expiring
             </button>
@@ -251,7 +251,7 @@ export const DriversView: React.FC<DriversViewProps> = ({ owner }) => {
         </div>
       )}
 
-      {/* 4 Core Stat Cards */}
+      {/* SECTION 3: KPI STAT CARDS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           label="Total Enrolled Pilots"
@@ -285,38 +285,30 @@ export const DriversView: React.FC<DriversViewProps> = ({ owner }) => {
         />
       </div>
 
-      {/* Filter and Search Bar */}
-      <div className="bg-white dark:bg-[#121214] border border-slate-200 dark:border-neutral-800 p-4 rounded-xl shadow-2xs space-y-3">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      {/* SECTION 4: FILTER CONTROLS & SEARCH */}
+      <div className="bg-white dark:bg-[#10131a] border border-slate-200/90 dark:border-neutral-800/80 p-4 sm:p-5 rounded-2xl shadow-2xs space-y-3">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
           {/* Search Bar */}
-          <div className="relative flex-1">
-            <Search className="w-4 h-4 text-slate-400 dark:text-neutral-500 absolute left-3 top-1/2 -translate-y-1/2" />
+          <div className="relative flex-1 max-w-md">
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by driver name, ID, DL number, route, or bus..."
-              className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 focus:border-amber-500 text-xs font-mono text-slate-900 dark:text-neutral-100 rounded-lg outline-none"
+              placeholder="Search by pilot name, employee ID, DL number, route, bus..."
+              className="w-full pl-8 pr-3 py-1.5 bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-full font-mono text-xs text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500"
             />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-mono text-slate-400 hover:text-slate-600 dark:hover:text-neutral-200 cursor-pointer"
-              >
-                Clear
-              </button>
-            )}
           </div>
 
-          {/* Controls: Roster Status, License Filter, View Toggle */}
+          {/* Filter Pills & View Mode */}
           <div className="flex flex-wrap items-center gap-2">
-            {/* Status Filter */}
-            <div className="flex items-center space-x-1 bg-slate-50 dark:bg-neutral-900 px-2 py-1 border border-slate-200 dark:border-neutral-800 rounded-lg">
-              <span className="text-[10px] font-mono uppercase text-slate-500 dark:text-neutral-400 font-bold">Duty:</span>
+            {/* Duty Select */}
+            <div className="flex items-center space-x-1.5 bg-slate-50 dark:bg-neutral-900 px-3 py-1 border border-slate-200 dark:border-neutral-800 rounded-full text-xs font-mono">
+              <span className="text-slate-400 uppercase text-[10px] font-bold">Duty:</span>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="bg-transparent text-xs font-mono text-slate-900 dark:text-neutral-100 font-semibold outline-none cursor-pointer"
+                className="bg-transparent text-slate-800 dark:text-white font-bold outline-none cursor-pointer"
               >
                 <option value="all" className="dark:bg-neutral-900">All ({totalDrivers})</option>
                 <option value="active" className="dark:bg-neutral-900">Active ({activeDrivers})</option>
@@ -325,13 +317,13 @@ export const DriversView: React.FC<DriversViewProps> = ({ owner }) => {
               </select>
             </div>
 
-            {/* License Validity Filter */}
-            <div className="flex items-center space-x-1 bg-slate-50 dark:bg-neutral-900 px-2 py-1 border border-slate-200 dark:border-neutral-800 rounded-lg">
-              <span className="text-[10px] font-mono uppercase text-slate-500 dark:text-neutral-400 font-bold">License:</span>
+            {/* License Select */}
+            <div className="flex items-center space-x-1.5 bg-slate-50 dark:bg-neutral-900 px-3 py-1 border border-slate-200 dark:border-neutral-800 rounded-full text-xs font-mono">
+              <span className="text-slate-400 uppercase text-[10px] font-bold">DL:</span>
               <select
                 value={licenseFilter}
                 onChange={(e) => setLicenseFilter(e.target.value)}
-                className="bg-transparent text-xs font-mono text-slate-900 dark:text-neutral-100 font-semibold outline-none cursor-pointer"
+                className="bg-transparent text-slate-800 dark:text-white font-bold outline-none cursor-pointer"
               >
                 <option value="all" className="dark:bg-neutral-900">All DLs</option>
                 <option value="valid" className="dark:bg-neutral-900">Valid ({totalDrivers - expiringSoonCount - expiredCount})</option>
@@ -341,32 +333,32 @@ export const DriversView: React.FC<DriversViewProps> = ({ owner }) => {
             </div>
 
             {/* View Mode Toggle */}
-            <div className="flex items-center space-x-0.5 bg-slate-50 dark:bg-neutral-900 p-1 border border-slate-200 dark:border-neutral-800 rounded-lg">
+            <div className="flex items-center space-x-1 bg-slate-50 dark:bg-neutral-900 p-1 border border-slate-200 dark:border-neutral-800 rounded-full">
               <button
                 onClick={() => setViewMode('grid')}
-                className={`p-1 rounded-md transition-colors cursor-pointer ${
-                  viewMode === 'grid' ? 'bg-slate-900 dark:bg-neutral-800 text-white' : 'text-slate-500 hover:text-slate-800 dark:hover:text-neutral-200'
+                className={`px-2.5 py-1 rounded-full text-xs font-mono transition-colors cursor-pointer flex items-center space-x-1 ${
+                  viewMode === 'grid' ? 'bg-blue-600 text-white font-bold' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'
                 }`}
-                title="Card Grid View"
               >
                 <Grid className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Cards</span>
               </button>
               <button
                 onClick={() => setViewMode('table')}
-                className={`p-1 rounded-md transition-colors cursor-pointer ${
-                  viewMode === 'table' ? 'bg-slate-900 dark:bg-neutral-800 text-white' : 'text-slate-500 hover:text-slate-800 dark:hover:text-neutral-200'
+                className={`px-2.5 py-1 rounded-full text-xs font-mono transition-colors cursor-pointer flex items-center space-x-1 ${
+                  viewMode === 'table' ? 'bg-blue-600 text-white font-bold' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'
                 }`}
-                title="Compliance Table View"
               >
                 <TableIcon className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Table</span>
               </button>
             </div>
           </div>
         </div>
 
-        {/* Filter tags bar */}
+        {/* Filter tags reset */}
         {(statusFilter !== 'all' || licenseFilter !== 'all' || searchQuery) && (
-          <div className="flex items-center space-x-2 pt-2 border-t border-slate-200 dark:border-neutral-800 text-xs font-mono">
+          <div className="flex items-center space-x-2 pt-2 border-t border-slate-100 dark:border-neutral-800 text-xs font-mono">
             <span className="text-slate-500 dark:text-neutral-400 text-[11px]">Filtered: {filteredDrivers.length} of {totalDrivers} pilots</span>
             <button
               onClick={() => {
@@ -374,7 +366,7 @@ export const DriversView: React.FC<DriversViewProps> = ({ owner }) => {
                 setStatusFilter('all');
                 setLicenseFilter('all');
               }}
-              className="text-amber-700 dark:text-amber-400 hover:underline text-[11px] font-bold cursor-pointer"
+              className="text-blue-600 hover:underline text-[11px] font-bold cursor-pointer"
             >
               Reset Filters
             </button>
@@ -382,195 +374,139 @@ export const DriversView: React.FC<DriversViewProps> = ({ owner }) => {
         )}
       </div>
 
-      {/* Main Roster Listing */}
+      {/* SECTION 5: ROSTER LISTING */}
       {loading ? (
-        <div className="p-12 text-center bg-white dark:bg-[#121214] border border-slate-200 dark:border-neutral-800 rounded-xl">
-          <RefreshCw className="w-6 h-6 animate-spin text-amber-600 dark:text-amber-400 mx-auto mb-2" />
-          <p className="text-xs font-mono text-slate-500 dark:text-neutral-400 uppercase">Loading driver profiles from Firestore...</p>
+        <div className="p-12 text-center bg-white dark:bg-[#10131a] border border-slate-200/90 dark:border-neutral-800/80 rounded-2xl">
+          <RefreshCw className="w-6 h-6 animate-spin text-blue-600 mx-auto mb-2" />
+          <p className="text-xs font-mono text-slate-500 dark:text-neutral-400 uppercase">Loading pilot profiles from Firestore...</p>
         </div>
       ) : filteredDrivers.length === 0 ? (
-        <div className="p-12 text-center bg-white dark:bg-[#121214] border border-slate-200 dark:border-neutral-800 rounded-xl space-y-3">
+        <div className="p-12 text-center bg-white dark:bg-[#10131a] border border-slate-200/90 dark:border-neutral-800/80 rounded-2xl space-y-3">
           <Users className="w-10 h-10 text-slate-300 dark:text-neutral-600 mx-auto" />
-          <h2 className="text-base font-bold text-slate-800 dark:text-neutral-200 font-sans">No driver profiles match your criteria</h2>
+          <h2 className="text-base font-bold text-slate-800 dark:text-neutral-200 font-sans">No pilot profiles match your criteria</h2>
           <p className="text-xs text-slate-500 dark:text-neutral-400 max-w-md mx-auto font-sans">
-            Try adjusting your search terms or filters, or enroll a new driver into the fleet roster.
+            Try adjusting your search terms or filters, or enroll a new pilot into the fleet roster.
           </p>
           <button
             onClick={() => setIsAddModalOpen(true)}
-            className="inline-flex items-center space-x-1.5 px-4 py-2 bg-slate-900 hover:bg-slate-800 dark:bg-amber-600 dark:hover:bg-amber-700 text-white dark:text-slate-950 text-xs font-mono uppercase font-bold rounded-lg cursor-pointer"
+            className="inline-flex items-center space-x-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-mono font-bold rounded-xl cursor-pointer"
           >
-            <Plus className="w-4 h-4 text-amber-400 dark:text-slate-950" />
-            <span>Enroll Driver</span>
+            <Plus className="w-4 h-4" />
+            <span>Enroll Pilot</span>
           </button>
         </div>
       ) : viewMode === 'grid' ? (
-        /* Grid Card View */
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        /* GRID CARDS */
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredDrivers.map((driver) => {
             const validity = getLicenseValidityInfo(driver.licenseExpiryDate);
 
             return (
               <div
                 key={driver.id}
-                className="bg-white dark:bg-[#121214] border border-slate-200 dark:border-neutral-800 rounded-xl shadow-2xs hover:border-slate-400 dark:hover:border-neutral-700 transition-all flex flex-col justify-between overflow-hidden"
+                className="bg-white dark:bg-[#10131a] border border-slate-200/90 dark:border-neutral-800/80 rounded-2xl p-5 shadow-2xs hover:border-slate-300 dark:hover:border-neutral-700 transition-all flex flex-col justify-between space-y-4"
               >
-                {/* Card Top Section */}
-                <div className="p-5 space-y-4">
+                <div className="space-y-3.5">
                   {/* Driver Header */}
                   <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-11 h-11 bg-slate-900 dark:bg-neutral-900 text-white dark:text-neutral-100 font-mono font-extrabold text-sm flex items-center justify-center rounded-lg shrink-0 border border-slate-700 dark:border-neutral-700">
+                    <div className="flex items-center space-x-3 min-w-0">
+                      <div className="w-10 h-10 bg-slate-900 dark:bg-neutral-800 text-white font-mono font-black text-sm flex items-center justify-center rounded-xl shrink-0 border border-slate-800 dark:border-neutral-700">
                         {driver.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
                       </div>
-                      <div>
-                        <div className="flex items-center space-x-2">
-                          <h3 className="font-bold text-base text-slate-900 dark:text-neutral-100 leading-snug">
+                      <div className="min-w-0">
+                        <div className="flex items-center space-x-1.5">
+                          <h3 className="font-bold text-sm text-slate-900 dark:text-white truncate font-sans">
                             {driver.name}
                           </h3>
-                          <span className="px-1.5 py-0.5 bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 text-[10px] font-mono font-bold text-slate-600 dark:text-neutral-400 rounded-md">
+                          <span className="px-1.5 py-0.5 bg-slate-100 dark:bg-neutral-800 text-[10px] font-mono font-bold text-slate-600 dark:text-neutral-400 rounded">
                             {driver.employeeId}
                           </span>
                         </div>
-                        <div className="flex items-center space-x-2 text-xs text-slate-500 dark:text-neutral-400 font-mono mt-0.5">
+                        <div className="flex items-center space-x-2 text-[11px] text-slate-500 dark:text-neutral-400 font-mono mt-0.5">
                           <span className="flex items-center space-x-1">
-                            <Phone className="w-3 h-3 text-slate-400 dark:text-neutral-500" />
+                            <Phone className="w-3 h-3 text-slate-400" />
                             <span>{driver.phone}</span>
                           </span>
                           {driver.bloodGroup && (
                             <>
                               <span>•</span>
-                              <span className="text-red-700 dark:text-red-400 font-semibold">{driver.bloodGroup}</span>
+                              <span className="text-rose-600 font-bold">{driver.bloodGroup}</span>
                             </>
                           )}
                         </div>
                       </div>
                     </div>
 
-                    {/* Operational Status Pill */}
-                    <div className="flex flex-col items-end gap-1">
-                      <span className={`px-2 py-0.5 text-[11px] font-mono font-bold uppercase rounded-md border ${
-                        driver.status === 'Active'
-                          ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/60'
-                          : driver.status === 'Relief'
-                          ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-800/60'
-                          : driver.status === 'On Leave'
-                          ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-800 dark:text-blue-300 border-blue-200 dark:border-blue-800/60'
-                          : 'bg-slate-100 dark:bg-neutral-900 text-slate-700 dark:text-neutral-300 border-slate-300 dark:border-neutral-800'
-                      }`}>
-                        {driver.status}
-                      </span>
-                      {driver.safetyScore && (
-                        <span className="text-[10px] font-mono text-slate-500 dark:text-neutral-400 flex items-center space-x-1">
-                          <Award className="w-3 h-3 text-amber-600 dark:text-amber-400" />
-                          <span>{driver.safetyScore}% Safety</span>
-                        </span>
-                      )}
-                    </div>
+                    {/* Status Pill */}
+                    <span className={`px-2.5 py-0.5 text-[10px] font-mono font-bold uppercase rounded-full border shrink-0 ${
+                      driver.status === 'Active'
+                        ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800'
+                        : driver.status === 'Relief'
+                        ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800'
+                        : 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800'
+                    }`}>
+                      {driver.status}
+                    </span>
                   </div>
 
-                  {/* Commercial License Validity Box */}
-                  <div className={`p-3 rounded-lg border space-y-2 ${
-                    validity.status === 'Expired'
-                      ? 'bg-red-50/70 dark:bg-red-950/30 border-red-200 dark:border-red-900/60'
-                      : validity.status === 'Expiring Soon'
-                      ? 'bg-amber-50/70 dark:bg-amber-950/30 border-amber-200 dark:border-amber-900/60'
-                      : 'bg-slate-50 dark:bg-neutral-900 border-slate-200 dark:border-neutral-800'
-                  }`}>
+                  {/* Commercial DL Box */}
+                  <div className="bg-slate-50 dark:bg-neutral-900/60 p-3 rounded-xl border border-slate-100 dark:border-neutral-800 space-y-2 text-xs font-mono">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-1.5 text-xs font-mono font-bold">
-                        <ShieldCheck className={`w-4 h-4 ${
-                          validity.status === 'Expired'
-                            ? 'text-red-600 dark:text-red-400'
-                            : validity.status === 'Expiring Soon'
-                            ? 'text-amber-600 dark:text-amber-400'
-                            : 'text-emerald-600 dark:text-emerald-400'
-                        }`} />
-                        <span className="text-slate-800 dark:text-neutral-200">DL: {driver.licenseNumber}</span>
+                      <div className="flex items-center space-x-1 text-slate-800 dark:text-white font-bold text-[11px]">
+                        <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+                        <span>DL: {driver.licenseNumber}</span>
                       </div>
-
-                      {/* License Status Badge */}
-                      <span className={`px-2 py-0.5 text-[10px] font-mono font-bold uppercase rounded-md border ${
+                      <span className={`px-1.5 py-0.2 text-[10px] font-bold rounded ${
                         validity.status === 'Expired'
-                          ? 'bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-300 border-red-300 dark:border-red-800 animate-pulse'
+                          ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300'
                           : validity.status === 'Expiring Soon'
-                          ? 'bg-amber-100 dark:bg-amber-950 text-amber-900 dark:text-amber-300 border-amber-300 dark:border-amber-800 font-extrabold'
-                          : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/60'
+                          ? 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
+                          : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
                       }`}>
                         {validity.label}
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2 text-xs font-mono text-slate-600 dark:text-neutral-400">
-                      <div>
-                        <span className="text-[10px] text-slate-400 dark:text-neutral-500 block uppercase">Authorization</span>
-                        <span className="font-semibold text-slate-800 dark:text-neutral-200 truncate block" title={driver.licenseType}>
-                          {driver.licenseType}
-                        </span>
-                      </div>
-                      <div>
-                        <span className="text-[10px] text-slate-400 dark:text-neutral-500 block uppercase">PSV Badge No.</span>
-                        <span className="font-semibold text-slate-800 dark:text-neutral-200">
-                          {driver.badgeNumber || 'N/A'}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between pt-1 border-t border-slate-200 dark:border-neutral-800 text-[11px] font-mono">
-                      <span className="text-slate-500 dark:text-neutral-400">
-                        Expires: <strong className="text-slate-800 dark:text-neutral-200">{driver.licenseExpiryDate}</strong>
-                      </span>
+                    <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-neutral-400 pt-1 border-t border-slate-200/60 dark:border-neutral-800">
+                      <span>Expires: <strong className="text-slate-800 dark:text-white">{driver.licenseExpiryDate}</strong></span>
                       <button
                         onClick={() => setSelectedDriverForRenew(driver)}
-                        className="text-amber-700 dark:text-amber-400 hover:underline font-bold cursor-pointer"
+                        className="text-blue-600 hover:underline font-bold cursor-pointer"
                       >
-                        {validity.status !== 'Valid' ? '⚡ Renew License' : 'Update Renewal'}
+                        Renew
                       </button>
                     </div>
                   </div>
 
-                  {/* Route & Bus Assignment Info */}
-                  <div className="space-y-2 text-xs">
-                    <div className="flex items-start space-x-2">
-                      <MapPin className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-                      <div className="flex-1">
-                        <span className="text-[10px] font-mono uppercase text-slate-400 dark:text-neutral-500 block">Assigned Route</span>
-                        <span className="font-bold text-slate-800 dark:text-neutral-200">
-                          {driver.assignedRouteName || 'All Routes (Relief / Standby)'}
-                        </span>
-                      </div>
+                  {/* Route & Bus Assignment */}
+                  <div className="bg-blue-50/40 dark:bg-blue-950/20 p-2.5 rounded-xl border border-blue-100 dark:border-blue-900/40 flex items-center justify-between text-xs font-mono">
+                    <div className="flex items-center space-x-2 truncate">
+                      <MapPin className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                      <span className="font-bold text-slate-800 dark:text-neutral-200 truncate">
+                        {driver.assignedRouteName || 'Standby Pool'}
+                      </span>
                     </div>
-
-                    <div className="flex items-center justify-between pt-1 border-t border-slate-100 dark:border-neutral-800">
-                      <div className="flex items-center space-x-1.5">
-                        <BusIcon className="w-3.5 h-3.5 text-slate-500 dark:text-neutral-400" />
-                        <span className="font-mono text-slate-700 dark:text-neutral-300 font-semibold">
-                          {driver.assignedBusReg || 'Standby Pool'}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center space-x-1 font-mono text-slate-500 dark:text-neutral-400 text-[11px]">
-                        <Clock className="w-3 h-3" />
-                        <span>{driver.shiftTiming || 'Regular Shift'}</span>
-                      </div>
-                    </div>
+                    <span className="text-[11px] text-slate-500 dark:text-neutral-400 shrink-0">
+                      {driver.assignedBusReg || 'No Bus'}
+                    </span>
                   </div>
                 </div>
 
-                {/* Card Action Footer */}
-                <div className="px-5 py-3 bg-slate-50 dark:bg-neutral-900 border-t border-slate-200 dark:border-neutral-800 flex items-center justify-between gap-2">
+                {/* Card Actions */}
+                <div className="pt-2 border-t border-slate-100 dark:border-neutral-800 flex items-center justify-between text-xs font-mono">
                   <button
                     onClick={() => setSelectedDriverForAssign(driver)}
-                    className="text-xs font-mono font-bold text-slate-700 dark:text-neutral-300 hover:text-slate-900 dark:hover:text-white flex items-center space-x-1 cursor-pointer"
+                    className="text-blue-600 hover:text-blue-700 font-bold flex items-center space-x-1 cursor-pointer"
                   >
-                    <MapPin className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-                    <span>Assign Route / Bus</span>
+                    <MapPin className="w-3.5 h-3.5" />
+                    <span>Assign Duty</span>
                   </button>
 
                   <button
                     onClick={() => setSelectedDriverForEdit(driver)}
-                    className="px-2.5 py-1 bg-white dark:bg-neutral-800 hover:bg-slate-100 dark:hover:bg-neutral-700 border border-slate-200 dark:border-neutral-700 text-slate-800 dark:text-neutral-200 text-xs font-mono font-semibold rounded-lg transition-colors flex items-center space-x-1 cursor-pointer"
+                    className="px-2.5 py-1 bg-slate-100 dark:bg-neutral-800 hover:bg-slate-200 dark:hover:bg-neutral-700 rounded-lg text-slate-700 dark:text-neutral-300 font-bold flex items-center space-x-1 cursor-pointer"
                   >
-                    <Edit2 className="w-3 h-3 text-slate-500 dark:text-neutral-400" />
+                    <Edit2 className="w-3 h-3" />
                     <span>Edit</span>
                   </button>
                 </div>
@@ -579,79 +515,70 @@ export const DriversView: React.FC<DriversViewProps> = ({ owner }) => {
           })}
         </div>
       ) : (
-        /* Compliance Table View */
-        <div className="bg-white dark:bg-[#121214] border border-slate-200 dark:border-neutral-800 rounded-xl shadow-2xs overflow-x-auto">
+        /* TABLE VIEW */
+        <div className="bg-white dark:bg-[#10131a] border border-slate-200/90 dark:border-neutral-800/80 rounded-2xl overflow-x-auto shadow-2xs">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
-              <tr className="bg-slate-900 dark:bg-neutral-900 text-white font-mono uppercase tracking-wider text-[11px] border-b border-slate-800 dark:border-neutral-800">
+              <tr className="bg-slate-50 dark:bg-neutral-900/80 text-slate-500 dark:text-neutral-400 font-mono uppercase tracking-wider text-[11px] border-b border-slate-200 dark:border-neutral-800">
                 <th className="py-3 px-4">Pilot / Employee</th>
-                <th className="py-3 px-3">Contact & Blood</th>
+                <th className="py-3 px-3">Contact</th>
                 <th className="py-3 px-3">Status</th>
-                <th className="py-3 px-4">Commercial DL & Badge</th>
-                <th className="py-3 px-3">License Validity</th>
-                <th className="py-3 px-4">Assigned Route</th>
+                <th className="py-3 px-4">Commercial DL</th>
+                <th className="py-3 px-3">Validity</th>
+                <th className="py-3 px-4">Assigned Corridor</th>
                 <th className="py-3 px-3">Bus Vehicle</th>
                 <th className="py-3 px-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-neutral-800">
+            <tbody className="divide-y divide-slate-100 dark:divide-neutral-800 font-sans">
               {filteredDrivers.map((driver) => {
                 const validity = getLicenseValidityInfo(driver.licenseExpiryDate);
 
                 return (
-                  <tr key={driver.id} className="hover:bg-slate-50/70 dark:hover:bg-neutral-900/50 transition-colors font-sans">
+                  <tr key={driver.id} className="hover:bg-slate-50/70 dark:hover:bg-neutral-900/50 transition-colors">
                     <td className="py-3.5 px-4">
-                      <div className="font-bold text-slate-900 dark:text-neutral-100 text-sm">{driver.name}</div>
+                      <div className="font-bold text-slate-900 dark:text-white text-sm">{driver.name}</div>
                       <div className="font-mono text-[11px] text-slate-500 dark:text-neutral-400">{driver.employeeId}</div>
                     </td>
 
                     <td className="py-3.5 px-3 font-mono text-slate-700 dark:text-neutral-300">
                       <div>{driver.phone}</div>
-                      <div className="text-[11px] text-red-700 dark:text-red-400 font-semibold">{driver.bloodGroup || 'Blood: N/A'}</div>
+                      <div className="text-[11px] text-rose-600 font-semibold">{driver.bloodGroup || 'Blood: N/A'}</div>
                     </td>
 
                     <td className="py-3.5 px-3">
-                      <span className={`px-2 py-0.5 text-[10px] font-mono font-bold uppercase rounded-md border whitespace-nowrap ${
+                      <span className={`px-2 py-0.5 text-[10px] font-mono font-bold uppercase rounded-full border whitespace-nowrap ${
                         driver.status === 'Active'
-                          ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/60'
+                          ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800'
                           : driver.status === 'Relief'
-                          ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-800/60'
-                          : driver.status === 'On Leave'
-                          ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-800 dark:text-blue-300 border-blue-200 dark:border-blue-800/60'
-                          : 'bg-slate-100 dark:bg-neutral-900 text-slate-700 dark:text-neutral-300 border-slate-300 dark:border-neutral-800'
+                          ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800'
+                          : 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800'
                       }`}>
                         {driver.status}
                       </span>
                     </td>
 
                     <td className="py-3.5 px-4 font-mono">
-                      <div className="font-bold text-slate-900 dark:text-neutral-100">{driver.licenseNumber}</div>
+                      <div className="font-bold text-slate-900 dark:text-white">{driver.licenseNumber}</div>
                       <div className="text-[11px] text-slate-500 dark:text-neutral-400">Badge: {driver.badgeNumber || 'N/A'}</div>
                     </td>
 
-                    <td className="py-3.5 px-3">
-                      <div className="space-y-1">
-                        <span className={`inline-block px-2 py-0.5 text-[10px] font-mono font-bold uppercase rounded-md border whitespace-nowrap ${
-                          validity.status === 'Expired'
-                            ? 'bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-300 border-red-300 dark:border-red-800 animate-pulse'
-                            : validity.status === 'Expiring Soon'
-                            ? 'bg-amber-100 dark:bg-amber-950 text-amber-900 dark:text-amber-300 border-amber-300 dark:border-amber-800 font-extrabold'
-                            : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800/60'
-                        }`}>
-                          {validity.label}
-                        </span>
-                        <div className="text-[10px] font-mono text-slate-500 dark:text-neutral-400">
-                          Due: {driver.licenseExpiryDate}
-                        </div>
-                      </div>
+                    <td className="py-3.5 px-3 font-mono">
+                      <span className={`inline-block px-2 py-0.5 text-[10px] font-bold rounded ${
+                        validity.status === 'Expired'
+                          ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300'
+                          : validity.status === 'Expiring Soon'
+                          ? 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
+                          : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
+                      }`}>
+                        {validity.label}
+                      </span>
+                      <div className="text-[10px] text-slate-400 mt-0.5">{driver.licenseExpiryDate}</div>
                     </td>
 
                     <td className="py-3.5 px-4">
                       <div className="font-semibold text-slate-800 dark:text-neutral-200 text-xs">
                         {driver.assignedRouteName || 'Standby / Relief'}
-                      </div>
-                      <div className="text-[11px] font-mono text-slate-500 dark:text-neutral-400">
-                        {driver.shiftTiming || 'Standard Shift'}
                       </div>
                     </td>
 
@@ -660,25 +587,22 @@ export const DriversView: React.FC<DriversViewProps> = ({ owner }) => {
                     </td>
 
                     <td className="py-3.5 px-4 text-right">
-                      <div className="flex items-center justify-end space-x-1.5">
+                      <div className="flex items-center justify-end space-x-1.5 font-mono">
                         <button
                           onClick={() => setSelectedDriverForRenew(driver)}
-                          className="px-2 py-1 bg-slate-50 dark:bg-neutral-800 hover:bg-amber-100 dark:hover:bg-neutral-700 text-amber-900 dark:text-amber-300 border border-slate-200 dark:border-neutral-700 text-[11px] font-mono font-bold rounded-md cursor-pointer"
-                          title="Update license renewal"
+                          className="px-2 py-1 bg-slate-100 dark:bg-neutral-800 hover:bg-slate-200 dark:hover:bg-neutral-700 text-blue-600 dark:text-blue-400 text-[11px] font-bold rounded-lg cursor-pointer"
                         >
                           Renew
                         </button>
                         <button
                           onClick={() => setSelectedDriverForAssign(driver)}
-                          className="px-2 py-1 bg-slate-50 dark:bg-neutral-800 hover:bg-slate-200 dark:hover:bg-neutral-700 text-slate-800 dark:text-neutral-200 border border-slate-200 dark:border-neutral-700 text-[11px] font-mono font-bold rounded-md cursor-pointer"
-                          title="Assign Route & Bus"
+                          className="px-2 py-1 bg-slate-100 dark:bg-neutral-800 hover:bg-slate-200 dark:hover:bg-neutral-700 text-slate-700 dark:text-neutral-300 text-[11px] font-bold rounded-lg cursor-pointer"
                         >
                           Assign
                         </button>
                         <button
                           onClick={() => setSelectedDriverForEdit(driver)}
-                          className="px-2 py-1 bg-white dark:bg-neutral-800 hover:bg-slate-100 dark:hover:bg-neutral-700 text-slate-700 dark:text-neutral-300 border border-slate-200 dark:border-neutral-700 text-[11px] font-mono font-semibold rounded-md cursor-pointer"
-                          title="Edit driver"
+                          className="px-2 py-1 bg-slate-100 dark:bg-neutral-800 hover:bg-slate-200 dark:hover:bg-neutral-700 text-slate-700 dark:text-neutral-300 text-[11px] font-bold rounded-lg cursor-pointer"
                         >
                           Edit
                         </button>
@@ -692,18 +616,7 @@ export const DriversView: React.FC<DriversViewProps> = ({ owner }) => {
         </div>
       )}
 
-      {/* RTO Reference Footer */}
-      <div className="p-4 bg-white dark:bg-[#121214] border border-slate-200 dark:border-neutral-800 rounded-xl text-xs text-slate-500 dark:text-neutral-400 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
-        <div className="flex items-center space-x-2 font-mono">
-          <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-          <span>Section 3 & 14, Motor Vehicles Act 1988 Compliance Active</span>
-        </div>
-        <div className="text-[11px] font-sans text-slate-400 dark:text-neutral-500">
-          Heavy Passenger Vehicles (PSV) require 3-year recurring medical fitness and endorsement renewal.
-        </div>
-      </div>
-
-      {/* Modals */}
+      {/* MODALS */}
       {isAddModalOpen && (
         <AddDriverModal
           owner={owner}

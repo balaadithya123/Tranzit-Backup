@@ -3,7 +3,8 @@ import { OwnerProfile, Bus, PayoutEntry } from '../types';
 import { collection, query, where, onSnapshot, doc, setDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { formatINR } from '../lib/utils';
-import { ShieldCheck, CheckCircle2, Clock, Plus, X } from 'lucide-react';
+import { ShieldCheck, CheckCircle2, Clock, Plus, X, Bus as BusIcon, Building, ArrowUpRight } from 'lucide-react';
+import { StatCard } from './StatCard';
 
 interface LeaseTermsPayoutsViewProps {
   owner: OwnerProfile;
@@ -72,83 +73,109 @@ export const LeaseTermsPayoutsView: React.FC<LeaseTermsPayoutsViewProps> = ({ ow
   };
 
   return (
-    <div className="space-y-6">
-      {/* Title Bar */}
-      <div className="bg-white dark:bg-[#121214] border border-slate-200 dark:border-neutral-800 p-5 sm:p-6 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xs transition-colors">
+    <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-300">
+      {/* SECTION 1: HEADER & ACTIONS */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-slate-200/80 dark:border-neutral-800">
         <div>
-          <div className="flex items-center space-x-2 text-xs font-mono text-teal-800 dark:text-teal-400 uppercase tracking-widest mb-1.5 font-bold">
-            <ShieldCheck className="w-3.5 h-3.5" />
-            <span>Lease</span>
+          <div className="flex items-center space-x-2">
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-sans tracking-tight">
+              Lease Terms & Monthly Guarantee
+            </h1>
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
+              Contract Active
+            </span>
           </div>
-          <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-neutral-100 tracking-tight font-sans">
-            Lease Terms & Guaranteed Payouts
-          </h2>
-          <p className="text-xs text-slate-500 dark:text-neutral-400 font-sans mt-0.5">
-            Fixed payouts credited on the 1st of each month.
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-neutral-400 mt-1">
+            Contractual bus leases, guaranteed monthly disbursements, and bank settlement logs.
           </p>
         </div>
 
-        {/* Guaranteed Monthly Payout Box */}
-        <div className="bg-teal-50 dark:bg-neutral-900 border border-teal-200 dark:border-neutral-800 p-4 rounded-xl text-left md:text-right shadow-2xs">
-          <span className="text-[10px] font-mono uppercase text-teal-900 dark:text-teal-300 block font-bold">
-            Monthly Guarantee
-          </span>
-          <span className="text-2xl font-mono font-bold text-teal-950 dark:text-teal-400">
-            {formatINR(totalMonthlyLeaseGuarantee || 0)} / mo
-          </span>
+        <div className="flex items-center space-x-2.5 self-start md:self-auto">
+          <button
+            onClick={() => setIsPayoutModalOpen(true)}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-mono font-bold rounded-xl transition-colors flex items-center space-x-1.5 cursor-pointer shadow-md shadow-blue-500/20"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Record Payout</span>
+          </button>
         </div>
       </div>
 
-      {/* Leased Buses Table */}
-      <div className="bg-white dark:bg-[#121214] border border-slate-200 dark:border-neutral-800 rounded-xl overflow-hidden shadow-xs transition-colors">
-        <div className="p-4 border-b border-slate-200 dark:border-neutral-800 bg-slate-50/70 dark:bg-neutral-900/40 flex items-center justify-between">
-          <span className="text-xs font-mono uppercase font-bold text-slate-800 dark:text-neutral-200">
-            Leased Bus Contracts ({buses.length})
-          </span>
-          <span className="text-[11px] font-mono text-teal-800 dark:text-teal-300 bg-teal-100 dark:bg-teal-950/40 px-2.5 py-0.5 rounded-md border border-teal-300 dark:border-teal-800/60 font-semibold">
-            Managed by Tranzit
+      {/* SECTION 2: STAT CARDS */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <StatCard
+          label="Guaranteed Monthly Lease Payout"
+          value={`${formatINR(totalMonthlyLeaseGuarantee || 0)}`}
+          subtext="Direct auto-credit on the 1st of every month"
+          icon={ShieldCheck}
+        />
+        <StatCard
+          label="Contracted Vehicles"
+          value={`${buses.length} Buses`}
+          subtext="Fully managed and insured by Tranzit"
+          icon={BusIcon}
+        />
+        <StatCard
+          label="Settlement Partner"
+          value="HDFC Bank"
+          subtext="Corporate escrow direct clearing"
+          icon={Building}
+        />
+      </div>
+
+      {/* SECTION 3: LEASED CONTRACTS TABLE */}
+      <div className="bg-white dark:bg-[#10131a] border border-slate-200/90 dark:border-neutral-800/80 rounded-2xl p-4 sm:p-5 shadow-2xs space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-neutral-800">
+          <div className="flex items-center space-x-2">
+            <ShieldCheck className="w-4 h-4 text-blue-600" />
+            <h3 className="font-bold text-sm text-slate-900 dark:text-white font-sans">
+              Leased Fleet Contracts ({buses.length})
+            </h3>
+          </div>
+          <span className="text-[11px] font-mono text-emerald-600 font-bold bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800/60">
+            Escrow Backed
           </span>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full text-left border-collapse text-xs font-sans">
             <thead>
-              <tr className="border-b border-slate-200 dark:border-neutral-800 bg-slate-50/50 dark:bg-neutral-900/60 text-[11px] font-mono uppercase text-slate-500 dark:text-neutral-400">
+              <tr className="border-b border-slate-200 dark:border-neutral-800 bg-slate-50 dark:bg-neutral-900/60 text-[11px] font-mono uppercase text-slate-500 dark:text-neutral-400">
                 <th className="py-3 px-4">Bus Registration</th>
-                <th className="py-3 px-4">Vehicle Model</th>
+                <th className="py-3 px-4">Model</th>
                 <th className="py-3 px-4">Capacity</th>
-                <th className="py-3 px-4">Monthly Lease Value</th>
-                <th className="py-3 px-4">Lease Renewal Date</th>
+                <th className="py-3 px-4">Monthly Lease Amount</th>
+                <th className="py-3 px-4">Renewal Date</th>
                 <th className="py-3 px-4 text-right">Contract Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-neutral-800 text-xs">
+            <tbody className="divide-y divide-slate-100 dark:divide-neutral-800">
               {buses.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-slate-400 dark:text-neutral-500 font-mono">
+                  <td colSpan={6} className="py-8 text-center text-slate-400 font-mono">
                     No leased vehicles found.
                   </td>
                 </tr>
               ) : (
                 buses.map((bus) => (
-                  <tr key={bus.id} className="hover:bg-slate-50/70 dark:hover:bg-neutral-900/50 transition-colors">
-                    <td className="py-3.5 px-4 font-mono font-bold text-sm text-slate-900 dark:text-neutral-100">
+                  <tr key={bus.id} className="hover:bg-slate-50/70 dark:hover:bg-neutral-900/40 transition-colors">
+                    <td className="py-3.5 px-4 font-mono font-bold text-sm text-slate-900 dark:text-white">
                       {bus.regNumber}
                     </td>
-                    <td className="py-3.5 px-4 font-medium text-slate-700 dark:text-neutral-300">
+                    <td className="py-3.5 px-4 font-bold text-slate-800 dark:text-neutral-200">
                       {bus.model}
                     </td>
                     <td className="py-3.5 px-4 font-mono text-slate-600 dark:text-neutral-400">
                       {bus.capacity} Seats
                     </td>
-                    <td className="py-3.5 px-4 font-mono font-bold text-teal-800 dark:text-teal-400 text-sm">
+                    <td className="py-3.5 px-4 font-mono font-bold text-blue-600 dark:text-blue-400 text-sm">
                       {formatINR(bus.leaseValue || 0)} / mo
                     </td>
                     <td className="py-3.5 px-4 font-mono text-slate-600 dark:text-neutral-400">
                       {bus.renewalDate || '—'}
                     </td>
                     <td className="py-3.5 px-4 text-right">
-                      <span className="px-2.5 py-1 text-[10px] font-mono font-bold uppercase rounded-md bg-teal-100 dark:bg-teal-950/40 text-teal-900 dark:text-teal-300 border border-teal-300 dark:border-teal-800/60">
+                      <span className="px-2.5 py-0.5 text-[10px] font-mono font-bold uppercase rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
                         Active Lease
                       </span>
                     </td>
@@ -160,53 +187,45 @@ export const LeaseTermsPayoutsView: React.FC<LeaseTermsPayoutsViewProps> = ({ ow
         </div>
       </div>
 
-      {/* Payout History Table */}
-      <div className="bg-white dark:bg-[#121214] border border-slate-200 dark:border-neutral-800 rounded-xl overflow-hidden shadow-xs transition-colors">
-        <div className="p-4 border-b border-slate-200 dark:border-neutral-800 bg-slate-50/70 dark:bg-neutral-900/40 flex items-center justify-between">
-          <div>
-            <h3 className="text-xs font-mono uppercase font-bold text-slate-800 dark:text-neutral-200">
+      {/* SECTION 4: PAYOUT HISTORY */}
+      <div className="bg-white dark:bg-[#10131a] border border-slate-200/90 dark:border-neutral-800/80 rounded-2xl p-4 sm:p-5 shadow-2xs space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-neutral-800">
+          <div className="flex items-center space-x-2">
+            <Clock className="w-4 h-4 text-blue-600" />
+            <h3 className="font-bold text-sm text-slate-900 dark:text-white font-sans">
               Payout History & Scheduled Transfers
             </h3>
-            <span className="text-[11px] text-slate-500 dark:text-neutral-400">Direct NEFT/RTGS bank transfers</span>
           </div>
-
-          <button
-            onClick={() => setIsPayoutModalOpen(true)}
-            className="px-3 py-1.5 bg-teal-700 hover:bg-teal-800 text-white text-xs font-mono uppercase font-bold rounded-lg transition-colors flex items-center space-x-1 cursor-pointer shadow-2xs"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span>Add Payout Record</span>
-          </button>
+          <span className="text-[11px] font-mono text-slate-400">Direct RTGS / NEFT Settlements</span>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full text-left border-collapse text-xs font-mono">
             <thead>
-              <tr className="border-b border-slate-200 dark:border-neutral-800 bg-slate-50/50 dark:bg-neutral-900/60 text-[11px] font-mono uppercase text-slate-500 dark:text-neutral-400">
+              <tr className="border-b border-slate-200 dark:border-neutral-800 bg-slate-50 dark:bg-neutral-900/60 text-[11px] uppercase text-slate-500 dark:text-neutral-400">
                 <th className="py-3 px-4">Payout Date</th>
-                <th className="py-3 px-4">Amount (₹)</th>
+                <th className="py-3 px-4">Amount</th>
                 <th className="py-3 px-4">Status</th>
                 <th className="py-3 px-4">Reference / Txn #</th>
                 <th className="py-3 px-4 text-right">Settlement Bank</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-neutral-800 text-xs font-mono">
+            <tbody className="divide-y divide-slate-100 dark:divide-neutral-800">
               {payouts.map((p) => (
-                <tr key={p.id} className="hover:bg-slate-50/70 dark:hover:bg-neutral-900/50 transition-colors">
-                  <td className="py-3.5 px-4 font-bold text-slate-900 dark:text-neutral-100">
+                <tr key={p.id} className="hover:bg-slate-50/70 dark:hover:bg-neutral-900/40 transition-colors">
+                  <td className="py-3.5 px-4 font-bold text-slate-900 dark:text-white">
                     {p.date}
                   </td>
-                  <td className="py-3.5 px-4 font-bold text-teal-800 dark:text-teal-400 text-sm">
+                  <td className="py-3.5 px-4 font-bold text-blue-600 dark:text-blue-400 text-sm">
                     {formatINR(p.amount)}
                   </td>
                   <td className="py-3.5 px-4">
-                    <span className={`px-2 py-0.5 text-[10px] font-bold uppercase rounded-md border flex items-center w-fit space-x-1 ${
-                      p.status === 'Paid' ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800/60' :
-                      p.status === 'Scheduled' ? 'bg-teal-100 dark:bg-teal-950/40 text-teal-900 dark:text-teal-300 border-teal-300 dark:border-teal-800/60' :
-                      'bg-amber-100 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 border-amber-300 dark:border-amber-800/60'
+                    <span className={`px-2.5 py-0.5 text-[10px] font-bold uppercase rounded-full border inline-flex items-center space-x-1 ${
+                      p.status === 'Paid'
+                        ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800'
+                        : 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400 border-blue-200 dark:border-blue-800'
                     }`}>
-                      {p.status === 'Paid' && <CheckCircle2 className="w-3 h-3 text-emerald-700 dark:text-emerald-400" />}
-                      {p.status === 'Scheduled' && <Clock className="w-3 h-3 text-teal-700 dark:text-teal-400" />}
+                      {p.status === 'Paid' ? <CheckCircle2 className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
                       <span>{p.status}</span>
                     </span>
                   </td>
@@ -223,18 +242,18 @@ export const LeaseTermsPayoutsView: React.FC<LeaseTermsPayoutsViewProps> = ({ ow
         </div>
       </div>
 
-      {/* Add Payout Record Modal */}
+      {/* RECORD PAYOUT MODAL */}
       {isPayoutModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#121214] border border-slate-200 dark:border-neutral-800 max-w-md w-full p-6 rounded-xl shadow-xl animate-in fade-in text-slate-900 dark:text-neutral-100">
+          <div className="bg-white dark:bg-[#10131a] border border-slate-200/90 dark:border-neutral-800/80 max-w-md w-full p-6 rounded-2xl shadow-2xl animate-in fade-in zoom-in-95 duration-150 text-slate-900 dark:text-white">
             <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-neutral-800 mb-4">
-              <h3 className="text-base font-extrabold text-slate-900 dark:text-neutral-100 font-sans">
+              <h3 className="text-base font-bold text-slate-900 dark:text-white font-sans">
                 Record Lease Payout Schedule
               </h3>
               <button
                 type="button"
                 onClick={() => setIsPayoutModalOpen(false)}
-                className="p-1 text-slate-400 hover:text-slate-800 dark:hover:text-neutral-200 cursor-pointer"
+                className="p-1.5 text-slate-400 hover:text-slate-800 dark:hover:text-white rounded-xl"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -242,34 +261,40 @@ export const LeaseTermsPayoutsView: React.FC<LeaseTermsPayoutsViewProps> = ({ ow
 
             <form onSubmit={handleAddPayoutRecord} className="space-y-4">
               <div>
-                <label className="block text-xs font-mono uppercase text-slate-600 dark:text-neutral-400 mb-1">Payout Date</label>
+                <label className="block text-xs font-mono uppercase text-slate-600 dark:text-neutral-400 mb-1 font-bold">
+                  Payout Date
+                </label>
                 <input
                   type="date"
                   required
                   value={payoutDate}
                   onChange={(e) => setPayoutDate(e.target.value)}
-                  className="w-full px-3 py-2 text-xs font-mono border border-slate-200 dark:border-neutral-700 rounded-lg bg-slate-50 dark:bg-neutral-900 text-slate-900 dark:text-neutral-100 focus:outline-none focus:border-teal-500"
+                  className="w-full px-3 py-2 text-xs font-mono border border-slate-200 dark:border-neutral-800 rounded-xl bg-slate-50 dark:bg-neutral-900 text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-mono uppercase text-slate-600 dark:text-neutral-400 mb-1">Payout Amount (₹)</label>
+                <label className="block text-xs font-mono uppercase text-slate-600 dark:text-neutral-400 mb-1 font-bold">
+                  Payout Amount (₹)
+                </label>
                 <input
                   type="number"
                   required
                   min={1000}
                   value={payoutAmount}
                   onChange={(e) => setPayoutAmount(Number(e.target.value))}
-                  className="w-full px-3 py-2 text-xs font-mono border border-slate-200 dark:border-neutral-700 rounded-lg bg-slate-50 dark:bg-neutral-900 text-slate-900 dark:text-neutral-100 focus:outline-none focus:border-teal-500"
+                  className="w-full px-3 py-2 text-xs font-mono border border-slate-200 dark:border-neutral-800 rounded-xl bg-slate-50 dark:bg-neutral-900 text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-mono uppercase text-slate-600 dark:text-neutral-400 mb-1">Status</label>
+                <label className="block text-xs font-mono uppercase text-slate-600 dark:text-neutral-400 mb-1 font-bold">
+                  Status
+                </label>
                 <select
                   value={payoutStatus}
                   onChange={(e) => setPayoutStatus(e.target.value as any)}
-                  className="w-full px-3 py-2 text-xs font-mono border border-slate-200 dark:border-neutral-700 rounded-lg bg-slate-50 dark:bg-neutral-900 text-slate-900 dark:text-neutral-100 focus:outline-none focus:border-teal-500"
+                  className="w-full px-3 py-2 text-xs font-mono border border-slate-200 dark:border-neutral-800 rounded-xl bg-slate-50 dark:bg-neutral-900 text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 cursor-pointer"
                 >
                   <option value="Scheduled">Scheduled</option>
                   <option value="Processing">Processing</option>
@@ -277,19 +302,19 @@ export const LeaseTermsPayoutsView: React.FC<LeaseTermsPayoutsViewProps> = ({ ow
                 </select>
               </div>
 
-              <div className="flex justify-end space-x-2 pt-3 border-t border-slate-200 dark:border-neutral-800">
+              <div className="flex items-center justify-end space-x-2.5 pt-3 border-t border-slate-200 dark:border-neutral-800">
                 <button
                   type="button"
                   onClick={() => setIsPayoutModalOpen(false)}
-                  className="px-4 py-2 border border-slate-200 dark:border-neutral-700 text-xs font-mono uppercase font-bold rounded-lg hover:bg-slate-100 dark:hover:bg-neutral-800 cursor-pointer"
+                  className="px-4 py-2 border border-slate-200 dark:border-neutral-700 text-xs font-mono font-bold rounded-xl hover:bg-slate-100 dark:hover:bg-neutral-800 cursor-pointer text-slate-600 dark:text-neutral-400"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-teal-700 hover:bg-teal-800 text-white text-xs font-mono uppercase font-bold rounded-lg cursor-pointer"
+                  className="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-mono font-bold rounded-xl cursor-pointer shadow-md shadow-blue-500/20"
                 >
-                  Save Payout Record
+                  Save Record
                 </button>
               </div>
             </form>

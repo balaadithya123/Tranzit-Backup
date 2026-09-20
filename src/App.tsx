@@ -8,6 +8,7 @@ import { db, auth } from './lib/firebase';
 import { AuthView } from './components/AuthView';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
+import { MobileBottomNav } from './components/MobileBottomNav';
 import { EditProfileModal } from './components/EditProfileModal';
 import { ReportsModal } from './components/ReportsModal';
 import { CommandPalette } from './components/CommandPalette';
@@ -38,6 +39,23 @@ function MainApp() {
   const [isReportsModalOpen, setIsReportsModalOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
+  const [layoutMode, setLayoutMode] = useState<'island' | 'classic'>(() => {
+    try {
+      return (localStorage.getItem('tranzit_layout_mode') as 'island' | 'classic') || 'island';
+    } catch (e) {
+      return 'island';
+    }
+  });
+
+  const toggleLayoutMode = () => {
+    setLayoutMode(prev => {
+      const next = prev === 'island' ? 'classic' : 'island';
+      try {
+        localStorage.setItem('tranzit_layout_mode', next);
+      } catch (e) {}
+      return next;
+    });
+  };
 
   // Fleet & driver telemetry for navigation badge alerts
   const [buses, setBuses] = useState<Bus[]>([]);
@@ -353,12 +371,14 @@ function MainApp() {
   }).length;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-black text-slate-900 dark:text-neutral-100 flex font-sans selection:bg-amber-500/20 transition-colors">
-      {/* Enterprise Sidebar Navigation */}
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0c0e15] text-slate-900 dark:text-neutral-100 flex font-sans transition-colors selection:bg-blue-500/20">
+      {/* Enterprise Sidebar Navigation (Desktop Fixed / Mobile Slide-out Drawer) */}
       <Sidebar
         owner={currentOwner}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
+        layoutMode={layoutMode}
+        onToggleLayoutMode={toggleLayoutMode}
         onLogout={handleLogout}
         onOpenProfileModal={() => setIsEditProfileOpen(true)}
         onOpenReportsModal={() => setIsReportsModalOpen(true)}
@@ -369,27 +389,30 @@ function MainApp() {
         driverAlertsCount={driverAlertsCount}
       />
 
-      {/* Main App Content Canvas */}
-      <div className="flex-1 lg:pl-72 flex flex-col min-w-0 transition-all">
-        {/* Sticky Top Header */}
-        <Header
-          owner={currentOwner}
-          activeTab={activeTab}
-          onOpenMobileSidebar={() => setIsMobileSidebarOpen(true)}
-          onOpenProfileModal={() => setIsEditProfileOpen(true)}
-          onOpenReportsModal={() => setIsReportsModalOpen(true)}
-          onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
-          onOpenShortcutsModal={() => setIsShortcutsOpen(true)}
-          onLogout={handleLogout}
-          onNavigateTab={setActiveTab}
-        />
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col min-w-0 lg:pl-72 w-full min-h-screen pb-20 lg:pb-8">
+        <div className="w-full max-w-7xl mx-auto p-3.5 sm:p-6 lg:p-8 flex-1 flex flex-col">
+          {/* Integrated Top Navigation Header */}
+          <Header
+            owner={currentOwner}
+            activeTab={activeTab}
+            layoutMode={layoutMode}
+            onToggleLayoutMode={toggleLayoutMode}
+            onOpenMobileSidebar={() => setIsMobileSidebarOpen(true)}
+            onOpenProfileModal={() => setIsEditProfileOpen(true)}
+            onOpenReportsModal={() => setIsReportsModalOpen(true)}
+            onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+            onOpenShortcutsModal={() => setIsShortcutsOpen(true)}
+            onLogout={handleLogout}
+            onNavigateTab={setActiveTab}
+          />
 
-        {/* Tab Module Canvas */}
-        <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+          {/* Tab Module Canvas */}
+          <main className="flex-1 w-full">
           <Suspense
             fallback={
-              <div className="flex flex-col items-center justify-center py-24 bg-white/60 dark:bg-neutral-900/60 border border-slate-200 dark:border-neutral-800 rounded-xl">
-                <RefreshCw className="w-6 h-6 animate-spin text-amber-600 dark:text-amber-400 mb-2" />
+              <div className="flex flex-col items-center justify-center py-24 bg-slate-50/50 dark:bg-neutral-900/50 border border-slate-200/80 dark:border-neutral-800 rounded-2xl">
+                <RefreshCw className="w-6 h-6 animate-spin text-blue-600 dark:text-blue-400 mb-2" />
                 <span className="font-mono text-xs uppercase tracking-wider text-slate-600 dark:text-neutral-400 font-bold">
                   Loading Fleet Module...
                 </span>
@@ -397,7 +420,10 @@ function MainApp() {
             }
           >
             {activeTab === 'overview' && (
-              <OverviewView owner={currentOwner} onNavigateTab={setActiveTab} />
+              <OverviewView 
+                owner={currentOwner} 
+                onNavigateTab={setActiveTab} 
+              />
             )}
 
             {activeTab === 'fares' && isSaaS && (
@@ -437,7 +463,7 @@ function MainApp() {
             {activeTab === 'subscription' && (
               <SubscriptionView 
                 owner={currentOwner} 
-                onNavigateTab={setActiveTab}
+                onNavigateTab={setActiveTab} 
                 onPlanUpdated={(updatedFields) => {
                   setCurrentOwner(prev => prev ? { ...prev, ...updatedFields } : null);
                 }}
@@ -452,26 +478,18 @@ function MainApp() {
             )}
           </Suspense>
         </main>
-
-        {/* Operational Footer */}
-        <footer className="bg-white dark:bg-[#0A0A0A] border-t border-slate-200 dark:border-neutral-800 py-5 mt-auto text-xs font-mono text-slate-500 dark:text-neutral-400 transition-colors">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center space-x-2">
-              <span className="font-extrabold text-slate-900 dark:text-neutral-100">TRANZIT OS</span>
-              <span>•</span>
-              <span>Private Bus Operations Platform India</span>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <span className="flex items-center space-x-1.5 text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 border border-emerald-500/20 rounded-md">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>Firestore Synced</span>
-              </span>
-              <span>{currentOwner.companyName} ({currentOwner.planType})</span>
-            </div>
-          </div>
-        </footer>
+        </div>
       </div>
+
+      {/* Mobile Bottom Navigation Bar (Fixed 1-thumb switcher on mobile) */}
+      <MobileBottomNav
+        owner={currentOwner}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        onOpenMobileDrawer={() => setIsMobileSidebarOpen(true)}
+        maintenanceAlertsCount={maintenanceAlertsCount}
+        driverAlertsCount={driverAlertsCount}
+      />
 
       {/* Global Modals */}
       {isEditProfileOpen && (

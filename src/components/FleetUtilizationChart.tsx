@@ -37,10 +37,10 @@ export interface DayUtilizationData {
 }
 
 export const FleetUtilizationChart: React.FC<FleetUtilizationChartProps> = ({
-  buses,
-  totalBusesCount,
-  activeBusesCount,
-  planType,
+  buses = [],
+  totalBusesCount = 0,
+  activeBusesCount = 0,
+  planType = 'SaaS',
   onNavigateTab
 }) => {
   const [selectedMetric, setSelectedMetric] = useState<'percent' | 'buses'>('percent');
@@ -49,9 +49,10 @@ export const FleetUtilizationChart: React.FC<FleetUtilizationChartProps> = ({
   const isDark = resolvedTheme === 'dark';
 
   // Only use real fleet numbers — never fall back to hardcoded 3 buses
-  const totalFleet = buses.length > 0 ? buses.length : (totalBusesCount > 0 ? totalBusesCount : 0);
-  const currentActive = buses.length > 0 
-    ? buses.filter(b => b.status === 'Active').length 
+  const safeBuses = Array.isArray(buses) ? buses : [];
+  const totalFleet = safeBuses.length > 0 ? safeBuses.length : (totalBusesCount > 0 ? totalBusesCount : 0);
+  const currentActive = safeBuses.length > 0 
+    ? safeBuses.filter(b => b && b.status === 'Active').length 
     : (activeBusesCount > 0 ? activeBusesCount : 0);
 
   // Calculate the last 7 days data anchored to today (Sep 17, 2026)
@@ -129,7 +130,7 @@ export const FleetUtilizationChart: React.FC<FleetUtilizationChartProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-[#121214] border border-slate-200 dark:border-neutral-800 p-5 sm:p-6 rounded-xl shadow-xs transition-colors">
+    <div className="bg-white dark:bg-[#10131a] border border-slate-200/90 dark:border-neutral-800/80 p-5 sm:p-6 rounded-2xl shadow-xs transition-colors">
       {/* Chart Section Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-neutral-800">
         <div>

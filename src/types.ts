@@ -106,7 +106,7 @@ export interface MaintenanceRecord {
   mechanicShop?: string;
 }
 
-export type DriverStatus = 'Active' | 'On Leave' | 'Off Duty' | 'Relief';
+export type DriverStatus = 'Active' | 'On Leave' | 'Off Duty' | 'Relief' | 'profile incomplete';
 
 export type LicenseStatus = 'Valid' | 'Expiring Soon' | 'Expired';
 

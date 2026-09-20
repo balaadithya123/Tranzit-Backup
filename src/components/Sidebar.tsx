@@ -18,7 +18,8 @@ import {
   Keyboard,
   Settings,
   CreditCard,
-  Sliders
+  Sliders,
+  Layers
 } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { isPlatformAdmin } from '../lib/pricingService';
@@ -27,6 +28,8 @@ interface SidebarProps {
   owner: OwnerProfile;
   activeTab: string;
   setActiveTab: (tab: string) => void;
+  layoutMode?: 'island' | 'classic';
+  onToggleLayoutMode?: () => void;
   onLogout: () => void;
   onOpenProfileModal: () => void;
   onOpenReportsModal: () => void;
@@ -41,6 +44,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   owner,
   activeTab,
   setActiveTab,
+  layoutMode = 'island',
+  onToggleLayoutMode,
   onLogout,
   onOpenProfileModal,
   onOpenReportsModal,
@@ -403,6 +408,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Bottom Section: Reports, Status & Logout */}
         <div className="p-3.5 border-t border-slate-200 dark:border-neutral-800/90 bg-white/70 dark:bg-[#121214]/70 space-y-2">
+          {/* Layout Quick Action */}
+          {onToggleLayoutMode && (
+            <button
+              type="button"
+              onClick={onToggleLayoutMode}
+              className="w-full py-1.5 px-2 bg-slate-100 dark:bg-neutral-800 hover:bg-slate-200 dark:hover:bg-neutral-700 rounded-lg text-[11px] font-mono text-slate-700 dark:text-neutral-300 flex items-center justify-center space-x-1.5 transition-colors cursor-pointer"
+              title="Toggle between Island and Classic view"
+            >
+              <Layers className="w-3.5 h-3.5 text-blue-500" />
+              <span>Switch to {layoutMode === 'island' ? 'Classic View' : 'Island View'}</span>
+            </button>
+          )}
+
           {/* Quick PDF Export */}
           <button
             onClick={onOpenReportsModal}

@@ -1,27 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { OwnerProfile } from '../types';
 import { 
-  Menu, 
-  MapPin, 
+  Search, 
+  Bell, 
+  ChevronDown, 
+  Calendar, 
+  Menu,
+  Sparkles, 
   Download, 
-  Edit3, 
-  Search,
-  Keyboard,
-  LayoutDashboard,
-  Bus,
-  UserCheck,
-  Ticket,
-  Wallet,
-  FileText,
-  Fuel,
-  LogOut,
-  Settings
+  Keyboard, 
+  LogOut, 
+  User,
+  Layers
 } from 'lucide-react';
-import { ThemeToggle } from './ThemeToggle';
+import { isPlatformAdmin } from '../lib/pricingService';
 
 interface HeaderProps {
   owner: OwnerProfile;
   activeTab: string;
+  layoutMode?: 'island' | 'classic';
+  onToggleLayoutMode?: () => void;
   onOpenMobileSidebar: () => void;
   onOpenProfileModal: () => void;
   onOpenReportsModal: () => void;
@@ -34,6 +32,8 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({
   owner,
   activeTab,
+  layoutMode = 'island',
+  onToggleLayoutMode,
   onOpenMobileSidebar,
   onOpenProfileModal,
   onOpenReportsModal,
@@ -42,171 +42,240 @@ export const Header: React.FC<HeaderProps> = ({
   onLogout,
   onNavigateTab
 }) => {
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const [timeFilter, setTimeFilter] = useState('30 min');
+  const [isTimeDropdownOpen, setIsTimeDropdownOpen] = useState(false);
+
   const isSaaS = owner.planType === 'SaaS';
+  const isAdmin = isPlatformAdmin(owner);
 
-  const getTabLabel = (tab: string) => {
-    switch (tab) {
-      case 'overview':
-        return { title: 'Overview', category: 'Operations', icon: LayoutDashboard };
-      case 'fleet':
-        return { title: 'Fleet', category: 'Operations', icon: Bus };
-      case 'drivers':
-        return { title: 'Drivers', category: 'Operations', icon: UserCheck };
-      case 'fares':
-        return { title: 'Routes', category: 'Operations', icon: Ticket };
-      case 'earnings':
-        return { title: 'Earnings', category: 'Commercials', icon: Wallet };
-      case 'lease':
-        return { title: 'Lease & Payouts', category: 'Commercials', icon: FileText };
-      case 'fuel-perks':
-        return { title: 'Fuel Perks', category: 'Services', icon: Fuel };
-      case 'settings':
-        return { title: 'Settings', category: 'Preferences', icon: Settings };
-      default:
-        return { title: 'Overview', category: 'Console', icon: LayoutDashboard };
-    }
-  };
-
-  const tabInfo = getTabLabel(activeTab);
-  const IconComponent = tabInfo.icon;
+  const navTabs = [
+    { id: 'overview', label: 'Overview' },
+    { id: 'fleet', label: 'Fleet' },
+    { id: 'fares', label: 'Routes' },
+    { id: 'drivers', label: 'Drivers' },
+    { id: isSaaS ? 'earnings' : 'lease', label: isSaaS ? 'Earnings' : 'Lease & Payouts' },
+    { id: 'fuel-perks', label: 'Fuel Perks' },
+    { id: 'settings', label: 'Settings' },
+    ...(isAdmin ? [{ id: 'admin-pricing', label: 'Admin' }] : [])
+  ];
 
   return (
-    <header className="sticky top-0 z-30 bg-slate-50/85 dark:bg-black/85 backdrop-blur-md border-b border-slate-200 dark:border-neutral-800 px-4 sm:px-6 lg:px-8 py-3 transition-colors">
+    <header className="w-full pb-6 pt-1 flex flex-col gap-4 border-b border-slate-100 dark:border-neutral-800/80 mb-6">
       <div className="flex items-center justify-between gap-3">
-        {/* Left: Mobile Toggle & Breadcrumb */}
-        <div className="flex items-center space-x-3">
-          {/* Mobile Drawer Trigger */}
+        {/* Left: Brand Identity with OrchestrateIQ multi-bar logo */}
+        <div className="flex items-center space-x-3 shrink-0">
+          {/* Mobile Drawer Button */}
           <button
             onClick={onOpenMobileSidebar}
-            className="lg:hidden p-2 bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-lg text-slate-700 dark:text-neutral-200 hover:text-slate-900 dark:hover:text-white cursor-pointer shadow-2xs"
-            aria-label="Open Navigation Menu"
+            className="lg:hidden p-2 rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-slate-700 dark:text-neutral-300 hover:text-slate-900 dark:hover:text-white cursor-pointer"
+            aria-label="Open navigation menu"
           >
             <Menu className="w-5 h-5" />
           </button>
 
-          {/* Breadcrumb Hierarchy */}
+          {/* Logo Mark: Authentic Tranzit Icon */}
           <div className="flex items-center space-x-2.5">
-            <div className="p-2 bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-lg text-slate-800 dark:text-neutral-100 hidden sm:flex items-center justify-center shadow-2xs">
-              <IconComponent className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+            <div className="w-8 h-8 sm:w-9 sm:h-9 bg-slate-900 dark:bg-amber-500/20 text-white dark:text-amber-400 flex items-center justify-center font-extrabold text-sm sm:text-base tracking-tighter rounded-xl border border-slate-800 dark:border-amber-500/30 shadow-2xs">
+              TZ
             </div>
             <div>
-              <div className="flex items-center space-x-1.5 text-[10px] font-mono uppercase tracking-widest text-slate-400 dark:text-neutral-500">
-                <span>Tranzit</span>
-                <span>/</span>
-                <span className="text-slate-600 dark:text-neutral-400 font-medium">{tabInfo.category}</span>
-              </div>
-              <div className="flex items-center space-x-2 mt-0.5">
-                <h1 className="text-base sm:text-lg font-bold text-slate-900 dark:text-neutral-100 tracking-tight leading-none font-sans">
-                  {tabInfo.title}
-                </h1>
-                <span className={`px-2 py-0.5 text-[10px] font-mono font-bold rounded-md border ${
-                  isSaaS 
-                    ? 'bg-amber-500/10 text-amber-800 dark:text-amber-300 border-amber-500/20' 
-                    : 'bg-teal-500/10 text-teal-800 dark:text-teal-300 border-teal-500/20'
-                }`}>
-                  {owner.planType} Plan
+              <div className="flex items-center space-x-1.5">
+                <span className="font-extrabold text-base sm:text-lg tracking-tight text-slate-900 dark:text-white font-sans">
+                  Tranzit
+                </span>
+                <span className="text-[10px] font-mono px-1.5 py-0.2 bg-slate-200 dark:bg-neutral-800 text-slate-700 dark:text-neutral-300 rounded font-bold">
+                  OS
                 </span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Center/Right: Quick Search & Command Palette Bar */}
-        {onOpenCommandPalette && (
-          <button
-            onClick={onOpenCommandPalette}
-            className="hidden md:flex items-center space-x-2 px-3 py-1.5 bg-white dark:bg-neutral-900 hover:bg-slate-50 dark:hover:bg-neutral-800 border border-slate-200 dark:border-neutral-800 rounded-lg text-xs text-slate-500 dark:text-neutral-400 transition-colors cursor-pointer shadow-2xs max-w-xs w-full justify-between"
-            title="Search fleet, pilots, or jump to tabs (⌘K or /)"
-          >
-            <span className="flex items-center space-x-2 truncate">
-              <Search className="w-3.5 h-3.5 text-slate-400 dark:text-neutral-500 shrink-0" />
-              <span className="truncate">Search fleet, drivers, routes...</span>
-            </span>
-            <kbd className="px-1.5 py-0.5 bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-neutral-300 font-mono text-[10px] font-bold rounded border border-slate-200 dark:border-neutral-700 shrink-0">
-              ⌘K
-            </kbd>
-          </button>
-        )}
+        {/* Center: Floating Pill Navigation Tabs (Desktop) */}
+        <div className="hidden md:flex items-center bg-slate-100/80 dark:bg-neutral-900/90 p-1 rounded-full border border-slate-200/80 dark:border-neutral-800">
+          {navTabs.map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => onNavigateTab && onNavigateTab(tab.id)}
+                className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
+                  isActive
+                    ? 'bg-blue-600 text-white shadow-xs font-semibold'
+                    : 'text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
 
-        {/* Right: Quick Action Controls */}
-        <div className="flex items-center space-x-2 sm:space-x-2.5">
-          {/* Mobile search trigger */}
+        {/* Right: Live Pill, Layout Switcher, Time Filter, Search, Notifications, Profile */}
+        <div className="flex items-center space-x-2 sm:space-x-2.5 shrink-0">
+          {/* Live Indicator Pill */}
+          <div className="hidden sm:flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800/50 text-emerald-600 dark:text-emerald-400 font-mono text-xs font-bold shadow-2xs">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>Live</span>
+          </div>
+
+          {/* Layout Mode Preserved Switcher */}
+          {onToggleLayoutMode && (
+            <button
+              type="button"
+              onClick={onToggleLayoutMode}
+              className="hidden sm:flex items-center space-x-1.5 px-3 py-1.5 rounded-full border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 hover:bg-slate-50 dark:hover:bg-neutral-800 text-xs font-mono text-slate-700 dark:text-neutral-300 transition-colors shadow-2xs cursor-pointer"
+              title={layoutMode === 'island' ? 'Switch to Classic Enterprise Sidebar' : 'Switch to Modern Floating Island'}
+            >
+              <Layers className="w-3.5 h-3.5 text-blue-500" />
+              <span>{layoutMode === 'island' ? 'Island View' : 'Classic View'}</span>
+            </button>
+          )}
+
+          {/* Timeframe Dropdown Pill */}
+          <div className="relative">
+            <button
+              onClick={() => setIsTimeDropdownOpen(!isTimeDropdownOpen)}
+              className="flex items-center space-x-1.5 px-3 py-1.5 bg-white dark:bg-neutral-900 hover:bg-slate-50 dark:hover:bg-neutral-800 border border-slate-200 dark:border-neutral-800 rounded-full text-xs font-mono text-slate-700 dark:text-neutral-300 transition-colors cursor-pointer shadow-2xs"
+            >
+              <Calendar className="w-3.5 h-3.5 text-slate-400" />
+              <span>{timeFilter}</span>
+              <ChevronDown className="w-3 h-3 text-slate-400 ml-0.5" />
+            </button>
+
+            {isTimeDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-36 bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-xl shadow-xl z-50 py-1 font-mono text-xs animate-in fade-in zoom-in-95">
+                {['Live (Real-time)', '30 min', 'Today', 'Last 7 days', 'Last 30 days'].map((option) => (
+                  <button
+                    key={option}
+                    onClick={() => {
+                      setTimeFilter(option);
+                      setIsTimeDropdownOpen(false);
+                    }}
+                    className={`w-full text-left px-3 py-2 text-xs hover:bg-slate-100 dark:hover:bg-neutral-800 transition-colors ${
+                      timeFilter === option ? 'text-blue-600 dark:text-blue-400 font-bold bg-blue-50/50 dark:bg-blue-950/30' : 'text-slate-700 dark:text-neutral-300'
+                    }`}
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Search Icon Button */}
           {onOpenCommandPalette && (
             <button
               onClick={onOpenCommandPalette}
-              className="md:hidden p-2 bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-lg text-slate-600 dark:text-neutral-300 hover:text-slate-900 dark:hover:text-white cursor-pointer shadow-2xs"
-              title="Search command palette"
+              className="p-2 bg-white dark:bg-neutral-900 hover:bg-slate-50 dark:hover:bg-neutral-800 border border-slate-200 dark:border-neutral-800 rounded-full text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer shadow-2xs"
+              title="Search (⌘K)"
+              aria-label="Search"
             >
               <Search className="w-4 h-4" />
             </button>
           )}
 
-          {/* Operating Hub Pill */}
-          <button
-            onClick={onOpenProfileModal}
-            className="hidden sm:flex items-center space-x-1.5 px-3 py-1.5 bg-white dark:bg-neutral-900 hover:border-amber-500/60 border border-slate-200 dark:border-neutral-800 rounded-lg text-xs font-mono text-slate-700 dark:text-neutral-300 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer group shadow-2xs"
-            title="Edit Operating Hub City & Depot Address"
-          >
-            <MapPin className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform" />
-            <span className="text-slate-400 dark:text-neutral-500 text-[11px]">Hub:</span>
-            <span className="font-bold text-slate-900 dark:text-neutral-100">{owner.city || "Bengaluru"}</span>
-            <Edit3 className="w-3 h-3 text-slate-400 group-hover:text-amber-500 ml-0.5" />
-          </button>
-
-          {/* Quick PDF Report Trigger */}
+          {/* Notification Bell Button */}
           <button
             onClick={onOpenReportsModal}
-            className="flex items-center space-x-1.5 px-3 py-1.5 bg-white dark:bg-neutral-900 hover:border-amber-500/60 border border-slate-200 dark:border-neutral-800 text-xs font-mono font-bold text-slate-800 dark:text-neutral-200 hover:text-amber-700 dark:hover:text-amber-400 rounded-lg transition-colors cursor-pointer group shadow-2xs"
-            title="Export Monthly Revenue, Route Fares, and Fleet Maintenance PDF Reports"
+            className="relative p-2 bg-white dark:bg-neutral-900 hover:bg-slate-50 dark:hover:bg-neutral-800 border border-slate-200 dark:border-neutral-800 rounded-full text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer shadow-2xs"
+            title="Notifications & Reports"
+            aria-label="Notifications"
           >
-            <Download className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform" />
-            <span className="hidden lg:inline">Export PDF</span>
-            <span className="lg:hidden">PDF</span>
+            <Bell className="w-4 h-4" />
+            <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-blue-500 ring-2 ring-white dark:ring-neutral-900"></span>
           </button>
 
-          {/* Theme Toggle Button */}
-          <ThemeToggle />
-
-          {/* Settings & Account Configuration */}
-          <button
-            onClick={() => onNavigateTab ? onNavigateTab('settings') : onOpenProfileModal()}
-            className={`p-2 bg-white dark:bg-neutral-900 border rounded-lg transition-colors cursor-pointer shadow-2xs ${
-              activeTab === 'settings'
-                ? 'text-amber-600 dark:text-amber-400 border-amber-500/60 bg-amber-50 dark:bg-neutral-800'
-                : 'border-slate-200 dark:border-neutral-800 text-slate-500 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-neutral-100 hover:bg-slate-100 dark:hover:bg-neutral-800'
-            }`}
-            title="Account & Fleet Settings"
-            aria-label="Settings"
-          >
-            <Settings className="w-4 h-4" />
-          </button>
-
-          {/* Keyboard Shortcuts Helper */}
-          {onOpenShortcutsModal && (
+          {/* User Profile Capsule */}
+          <div className="relative">
             <button
-              onClick={onOpenShortcutsModal}
-              className="p-2 bg-white dark:bg-neutral-900 hover:bg-slate-100 dark:hover:bg-neutral-800 border border-slate-200 dark:border-neutral-800 rounded-lg text-slate-500 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-neutral-100 transition-colors cursor-pointer shadow-2xs hidden sm:flex"
-              title="Keyboard Shortcuts & Pro Tips (Press ?)"
-              aria-label="Keyboard Shortcuts"
+              onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+              className="flex items-center space-x-2 pl-1 pr-2 py-1 bg-white dark:bg-neutral-900 hover:bg-slate-50 dark:hover:bg-neutral-800 border border-slate-200 dark:border-neutral-800 rounded-full transition-colors cursor-pointer shadow-2xs"
             >
-              <Keyboard className="w-4 h-4" />
+              <div className="w-6 h-6 rounded-full bg-[#e06c53] text-white flex items-center justify-center font-bold text-xs">
+                {owner.name ? owner.name.charAt(0).toUpperCase() : 'P'}
+              </div>
+              <div className="text-left hidden xl:block">
+                <div className="text-xs font-bold text-slate-900 dark:text-white leading-tight font-sans truncate max-w-[110px]">
+                  {owner.name || 'Platform Team'}
+                </div>
+                <div className="text-[10px] text-slate-500 dark:text-neutral-400 font-mono leading-none">
+                  {owner.companyName || 'Owner • Tranzit'}
+                </div>
+              </div>
+              <ChevronDown className="w-3 h-3 text-slate-400" />
             </button>
-          )}
 
-          {/* Sign Out Button */}
-          {onLogout && (
-            <button
-              onClick={onLogout}
-              className="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 text-rose-700 hover:text-rose-800 dark:text-rose-300 dark:hover:text-rose-200 border border-rose-200 dark:border-rose-800/60 rounded-lg transition-colors cursor-pointer shadow-2xs flex items-center space-x-1.5 text-xs font-mono font-semibold"
-              title="Sign Out / Log Out of Tranzit"
-              aria-label="Sign Out"
-            >
-              <LogOut className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />
-              <span className="hidden sm:inline">Logout</span>
-            </button>
-          )}
+            {/* Profile Dropdown Menu */}
+            {isProfileDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-2xl shadow-2xl z-50 p-2 animate-in fade-in zoom-in-95">
+                <div className="px-3 py-2 border-b border-slate-100 dark:border-neutral-800 mb-1">
+                  <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{owner.name}</p>
+                  <p className="text-[11px] font-mono text-slate-500 dark:text-neutral-400 truncate">{owner.email}</p>
+                  <div className="mt-1 flex items-center gap-1.5">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                      {owner.planType} Plan
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => {
+                    setIsProfileDropdownOpen(false);
+                    onOpenProfileModal();
+                  }}
+                  className="w-full flex items-center space-x-2 px-3 py-2 text-xs text-slate-700 dark:text-neutral-300 hover:bg-slate-100 dark:hover:bg-neutral-800 rounded-xl transition-colors cursor-pointer"
+                >
+                  <User className="w-3.5 h-3.5 text-slate-400" />
+                  <span>Fleet Profile & City Hub</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setIsProfileDropdownOpen(false);
+                    onOpenReportsModal();
+                  }}
+                  className="w-full flex items-center space-x-2 px-3 py-2 text-xs text-slate-700 dark:text-neutral-300 hover:bg-slate-100 dark:hover:bg-neutral-800 rounded-xl transition-colors cursor-pointer"
+                >
+                  <Download className="w-3.5 h-3.5 text-slate-400" />
+                  <span>Download Fleet Reports</span>
+                </button>
+
+                {onOpenShortcutsModal && (
+                  <button
+                    onClick={() => {
+                      setIsProfileDropdownOpen(false);
+                      onOpenShortcutsModal();
+                    }}
+                    className="w-full flex items-center space-x-2 px-3 py-2 text-xs text-slate-700 dark:text-neutral-300 hover:bg-slate-100 dark:hover:bg-neutral-800 rounded-xl transition-colors cursor-pointer"
+                  >
+                    <Keyboard className="w-3.5 h-3.5 text-slate-400" />
+                    <span>Keyboard Shortcuts (?)</span>
+                  </button>
+                )}
+
+                {onLogout && (
+                  <div className="mt-1 pt-1 border-t border-slate-100 dark:border-neutral-800">
+                    <button
+                      onClick={() => {
+                        setIsProfileDropdownOpen(false);
+                        onLogout();
+                      }}
+                      className="w-full flex items-center space-x-2 px-3 py-2 text-xs text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl transition-colors cursor-pointer font-bold"
+                    >
+                      <LogOut className="w-3.5 h-3.5" />
+                      <span>Sign Out</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </header>
   );
 };
+

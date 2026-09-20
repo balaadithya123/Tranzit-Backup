@@ -14,10 +14,10 @@ import {
   RefreshCw, 
   ShieldAlert, 
   Sliders, 
-  HelpCircle,
-  Bus,
-  Users,
-  LogOut
+  Bus, 
+  Users, 
+  LogOut,
+  ArrowRight
 } from 'lucide-react';
 import { OwnerProfile, PlanType } from '../types';
 import { doc, setDoc } from 'firebase/firestore';
@@ -115,49 +115,49 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-200">
-      {/* View Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200 dark:border-neutral-800 pb-5">
+    <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-300">
+      {/* SECTION 1: HEADER & ACTIONS */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-slate-200/80 dark:border-neutral-800">
         <div>
-          <div className="flex items-center space-x-2.5">
-            <div className="p-2 bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-lg">
-              <Settings className="w-5 h-5" />
-            </div>
-            <h1 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-neutral-100">
-              Account & Fleet Settings
+          <div className="flex items-center space-x-2">
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-sans tracking-tight">
+              Carrier Configuration & Profile
             </h1>
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
+              Verified Operator
+            </span>
           </div>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-neutral-400 mt-1">
-            Configure operator identity, commercial plan settings, backup exports, and manage your account lifecycle.
+            Manage dispatch agency identity, operational fleet settings, exports, and account session controls.
           </p>
         </div>
 
-        <div className="flex items-center space-x-2.5">
+        <div className="flex items-center space-x-2.5 self-start md:self-auto">
           <button
             type="button"
             onClick={onOpenReportsModal}
-            className="px-3.5 py-2 bg-white dark:bg-neutral-900 hover:bg-slate-50 dark:hover:bg-neutral-800 border border-slate-200 dark:border-neutral-700 text-slate-800 dark:text-neutral-200 text-xs font-mono font-bold rounded-lg transition-colors flex items-center space-x-2 cursor-pointer shadow-2xs"
+            className="px-3.5 py-2 bg-white dark:bg-neutral-900 hover:bg-slate-50 dark:hover:bg-neutral-800 border border-slate-200 dark:border-neutral-800 text-slate-700 dark:text-neutral-200 text-xs font-mono font-bold rounded-xl transition-colors flex items-center space-x-1.5 cursor-pointer shadow-2xs"
           >
-            <Download className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-            <span>Export Data Report</span>
+            <Download className="w-3.5 h-3.5 text-blue-600" />
+            <span>Generate Statement</span>
           </button>
         </div>
       </div>
 
-      {/* Main Settings Form */}
+      {/* SECTION 2: MAIN SETTINGS FORM */}
       <form onSubmit={handleSaveProfile} className="space-y-6">
-        {/* Section 1: Operator & Company Identity */}
-        <div className="bg-white dark:bg-[#121214] border border-slate-200 dark:border-neutral-800 rounded-xl p-5 sm:p-6 shadow-2xs space-y-5">
-          <div className="flex items-center space-x-2.5 border-b border-slate-100 dark:border-neutral-800/80 pb-3">
-            <User className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-            <h2 className="text-sm font-bold uppercase font-mono tracking-wider text-slate-800 dark:text-neutral-200">
+        {/* OPERATOR PROFILE */}
+        <div className="bg-white dark:bg-[#10131a] border border-slate-200/90 dark:border-neutral-800/80 rounded-2xl p-5 sm:p-6 shadow-2xs space-y-4">
+          <div className="flex items-center space-x-2 pb-3 border-b border-slate-100 dark:border-neutral-800">
+            <User className="w-4 h-4 text-blue-600" />
+            <h2 className="text-sm font-bold uppercase font-mono tracking-wider text-slate-900 dark:text-white">
               Operator & Business Profile
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-mono font-semibold text-slate-700 dark:text-neutral-300 mb-1.5">
+              <label className="block text-xs font-mono uppercase text-slate-600 dark:text-neutral-400 mb-1 font-bold">
                 Operator Full Name
               </label>
               <div className="relative">
@@ -168,14 +168,14 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   onChange={(e) => setName(e.target.value)}
                   required
                   placeholder="e.g. Ramesh Kumar"
-                  className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-700 rounded-lg text-xs font-mono text-slate-900 dark:text-neutral-100 focus:outline-hidden focus:border-amber-500"
+                  className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-xl text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-mono font-semibold text-slate-700 dark:text-neutral-300 mb-1.5">
-                Fleet / Company Name
+              <label className="block text-xs font-mono uppercase text-slate-600 dark:text-neutral-400 mb-1 font-bold">
+                Fleet Agency Name
               </label>
               <div className="relative">
                 <Building className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
@@ -185,14 +185,14 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   onChange={(e) => setCompanyName(e.target.value)}
                   required
                   placeholder="e.g. SRS Royal Travels"
-                  className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-700 rounded-lg text-xs font-mono text-slate-900 dark:text-neutral-100 focus:outline-hidden focus:border-amber-500"
+                  className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-xl text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-mono font-semibold text-slate-700 dark:text-neutral-300 mb-1.5">
-                Registered Email (Account ID)
+              <label className="block text-xs font-mono uppercase text-slate-600 dark:text-neutral-400 mb-1 font-bold">
+                Account Email
               </label>
               <div className="relative">
                 <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
@@ -200,17 +200,14 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   type="email"
                   value={owner.email}
                   disabled
-                  className="w-full pl-9 pr-3 py-2 bg-slate-100 dark:bg-neutral-800/60 border border-slate-200 dark:border-neutral-800 rounded-lg text-xs font-mono text-slate-500 dark:text-neutral-400 cursor-not-allowed"
+                  className="w-full pl-9 pr-3 py-2 bg-slate-100 dark:bg-neutral-800/60 border border-slate-200 dark:border-neutral-800 rounded-xl text-xs font-mono text-slate-500 dark:text-neutral-400 cursor-not-allowed"
                 />
               </div>
-              <p className="text-[10px] text-slate-400 mt-1 font-mono">
-                Primary identifier used for database authentication & access rules.
-              </p>
             </div>
 
             <div>
-              <label className="block text-xs font-mono font-semibold text-slate-700 dark:text-neutral-300 mb-1.5">
-                Dispatch Phone Number
+              <label className="block text-xs font-mono uppercase text-slate-600 dark:text-neutral-400 mb-1 font-bold">
+                Dispatch Phone
               </label>
               <div className="relative">
                 <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
@@ -219,14 +216,14 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="+91 98000 00000"
-                  className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-700 rounded-lg text-xs font-mono text-slate-900 dark:text-neutral-100 focus:outline-hidden focus:border-amber-500"
+                  className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-xl text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-mono font-semibold text-slate-700 dark:text-neutral-300 mb-1.5">
-                Primary Operating Hub / City
+              <label className="block text-xs font-mono uppercase text-slate-600 dark:text-neutral-400 mb-1 font-bold">
+                Primary Operating City
               </label>
               <div className="relative">
                 <MapPin className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
@@ -235,77 +232,39 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   placeholder="e.g. Bengaluru"
-                  className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-700 rounded-lg text-xs font-mono text-slate-900 dark:text-neutral-100 focus:outline-hidden focus:border-amber-500"
+                  className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-xl text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
                 />
               </div>
             </div>
           </div>
         </div>
 
-        {/* Section 2: Commercial Model & Fleet Configuration */}
-        <div className="bg-white dark:bg-[#121214] border border-slate-200 dark:border-neutral-800 rounded-xl p-5 sm:p-6 shadow-2xs space-y-5">
-          <div className="flex items-center space-x-2.5 border-b border-slate-100 dark:border-neutral-800/80 pb-3">
-            <Sliders className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-            <h2 className="text-sm font-bold uppercase font-mono tracking-wider text-slate-800 dark:text-neutral-200">
+        {/* COMMERCIAL MODEL & FLEET PARAMS */}
+        <div className="bg-white dark:bg-[#10131a] border border-slate-200/90 dark:border-neutral-800/80 rounded-2xl p-5 sm:p-6 shadow-2xs space-y-4">
+          <div className="flex items-center space-x-2 pb-3 border-b border-slate-100 dark:border-neutral-800">
+            <Sliders className="w-4 h-4 text-blue-600" />
+            <h2 className="text-sm font-bold uppercase font-mono tracking-wider text-slate-900 dark:text-white">
               Commercial Model & Fleet Parameters
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs font-mono font-semibold text-slate-700 dark:text-neutral-300 mb-1.5">
+              <label className="block text-xs font-mono uppercase text-slate-600 dark:text-neutral-400 mb-1 font-bold">
                 Operational Business Model
               </label>
               <select
                 value={planType}
                 onChange={(e) => setPlanType(e.target.value as PlanType)}
-                className="w-full px-3 py-2 bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-700 rounded-lg text-xs font-mono text-slate-900 dark:text-neutral-100 focus:outline-hidden focus:border-amber-500 cursor-pointer"
+                className="w-full px-3 py-2 bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-xl text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 cursor-pointer"
               >
                 <option value="SaaS">SaaS (Direct Fares + Platform Tier)</option>
                 <option value="Lease">Lease (Fixed Monthly Yield)</option>
               </select>
             </div>
 
-            {planType === 'SaaS' && (
-              <div className="p-3.5 bg-amber-500/10 border border-amber-500/25 rounded-xl">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <CreditCard className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                    <span className="text-xs font-mono font-bold text-amber-900 dark:text-amber-200 uppercase">
-                      Current Subscription Plan
-                    </span>
-                  </div>
-                  <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-amber-200/70 dark:bg-amber-950/60 text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-700/60">
-                    {owner.subscriptionPlanName || (activeBusesCount <= 5 ? 'Starter' : activeBusesCount <= 20 ? 'Growth' : 'Enterprise')} Tier
-                  </span>
-                </div>
-
-                <div className="mt-2 text-xs font-mono text-slate-700 dark:text-neutral-300 flex items-center justify-between">
-                  <span>Per-Bus Platform Rate:</span>
-                  <span className="font-bold text-slate-900 dark:text-neutral-100">
-                    ₹{(owner.saasFeePerBus || (activeBusesCount <= 5 ? 649 : activeBusesCount <= 20 ? 899 : 1599)).toLocaleString('en-IN')} / bus / mo
-                  </span>
-                </div>
-
-                <p className="text-[11px] text-slate-500 dark:text-neutral-400 mt-2 font-sans">
-                  SaaS fees are determined strictly by platform administration and cannot be edited directly by owners.
-                </p>
-
-                {onNavigateTab && (
-                  <button
-                    type="button"
-                    onClick={() => onNavigateTab('subscription')}
-                    className="mt-3 w-full py-1.5 px-3 bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-mono font-bold rounded-lg transition-colors flex items-center justify-center space-x-1.5 cursor-pointer shadow-xs"
-                  >
-                    <span>View All Plan Tiers & Upgrade</span>
-                    <span>→</span>
-                  </button>
-                )}
-              </div>
-            )}
-
             <div>
-              <label className="block text-xs font-mono font-semibold text-slate-700 dark:text-neutral-300 mb-1.5">
+              <label className="block text-xs font-mono uppercase text-slate-600 dark:text-neutral-400 mb-1 font-bold">
                 Active Buses Count
               </label>
               <div className="relative">
@@ -315,14 +274,14 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   value={activeBusesCount}
                   onChange={(e) => setActiveBusesCount(Number(e.target.value))}
                   min={0}
-                  className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-700 rounded-lg text-xs font-mono text-slate-900 dark:text-neutral-100 focus:outline-hidden focus:border-amber-500"
+                  className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-xl text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-mono font-semibold text-slate-700 dark:text-neutral-300 mb-1.5">
-                Average Daily Passengers
+              <label className="block text-xs font-mono uppercase text-slate-600 dark:text-neutral-400 mb-1 font-bold">
+                Daily Average Passengers
               </label>
               <div className="relative">
                 <Users className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
@@ -331,23 +290,48 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   value={avgDailyRiders}
                   onChange={(e) => setAvgDailyRiders(Number(e.target.value))}
                   min={0}
-                  className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-700 rounded-lg text-xs font-mono text-slate-900 dark:text-neutral-100 focus:outline-hidden focus:border-amber-500"
+                  className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-xl text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-blue-500"
                 />
               </div>
             </div>
           </div>
 
-          {/* Feedback message */}
+          {/* SaaS Plan summary pill */}
+          {planType === 'SaaS' && (
+            <div className="p-4 bg-blue-50/60 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800/60 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <span className="text-xs font-mono font-bold text-blue-900 dark:text-blue-200 uppercase">
+                  Active Subscription: {owner.subscriptionPlanName || (activeBusesCount <= 5 ? 'Starter' : activeBusesCount <= 20 ? 'Growth' : 'Enterprise')} Tier
+                </span>
+                <p className="text-[11px] text-slate-600 dark:text-neutral-400 font-sans mt-0.5">
+                  Standard platform rate: ₹{(owner.saasFeePerBus || (activeBusesCount <= 5 ? 649 : activeBusesCount <= 20 ? 899 : 1599)).toLocaleString('en-IN')}/bus/month.
+                </p>
+              </div>
+
+              {onNavigateTab && (
+                <button
+                  type="button"
+                  onClick={() => onNavigateTab('subscription')}
+                  className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-mono text-xs font-bold rounded-xl cursor-pointer transition-colors shrink-0 flex items-center space-x-1 shadow-xs"
+                >
+                  <span>Manage Plans</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Feedback messages */}
           {saveSuccess && (
-            <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-400 rounded-lg text-xs font-mono flex items-center space-x-2">
-              <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-              <span>Operator settings updated successfully in Firestore.</span>
+            <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 rounded-xl text-xs font-mono flex items-center space-x-2">
+              <Check className="w-4 h-4 text-emerald-600" />
+              <span>Operator profile settings saved successfully in Firestore.</span>
             </div>
           )}
 
           {saveError && (
-            <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 rounded-lg text-xs font-mono flex items-center space-x-2">
-              <AlertTriangle className="w-4 h-4" />
+            <div className="p-3 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-300 rounded-xl text-xs font-mono flex items-center space-x-2">
+              <AlertTriangle className="w-4 h-4 text-red-600" />
               <span>{saveError}</span>
             </div>
           )}
@@ -357,7 +341,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             <button
               type="submit"
               disabled={isSaving}
-              className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 dark:bg-amber-500 dark:hover:bg-amber-400 text-white dark:text-slate-950 text-xs font-mono uppercase font-bold tracking-wider rounded-lg transition-colors flex items-center space-x-2 cursor-pointer shadow-xs disabled:opacity-50"
+              className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-mono uppercase font-bold tracking-wider rounded-xl transition-colors flex items-center space-x-2 cursor-pointer shadow-md shadow-blue-500/20 disabled:opacity-50"
             >
               {isSaving ? (
                 <>
@@ -375,27 +359,27 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         </div>
       </form>
 
-      {/* Section 3: Active Session & Logout */}
-      <div className="bg-white dark:bg-[#121214] border border-slate-200 dark:border-neutral-800 rounded-xl p-5 sm:p-6 shadow-2xs space-y-4">
-        <div className="flex items-center justify-between border-b border-slate-100 dark:border-neutral-800/80 pb-3">
-          <div className="flex items-center space-x-2.5">
-            <LogOut className="w-4 h-4 text-slate-600 dark:text-neutral-400" />
-            <h2 className="text-sm font-bold uppercase font-mono tracking-wider text-slate-800 dark:text-neutral-200">
+      {/* SECTION 3: SESSION & LOGOUT */}
+      <div className="bg-white dark:bg-[#10131a] border border-slate-200/90 dark:border-neutral-800/80 rounded-2xl p-5 sm:p-6 shadow-2xs space-y-4">
+        <div className="flex items-center justify-between border-b border-slate-100 dark:border-neutral-800 pb-3">
+          <div className="flex items-center space-x-2">
+            <LogOut className="w-4 h-4 text-slate-500" />
+            <h2 className="text-sm font-bold uppercase font-mono tracking-wider text-slate-900 dark:text-white">
               Account Session & Sign Out
             </h2>
           </div>
-          <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
+          <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
             Active Session
           </span>
         </div>
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
-            <p className="text-xs text-slate-700 dark:text-neutral-300 font-medium">
-              Signed in as <span className="font-mono font-bold text-slate-900 dark:text-neutral-100">{owner.email}</span>
+            <p className="text-xs text-slate-700 dark:text-neutral-300 font-medium font-sans">
+              Signed in as <span className="font-mono font-bold text-slate-900 dark:text-white">{owner.email}</span>
             </p>
-            <p className="text-[11px] text-slate-500 dark:text-neutral-400 font-sans">
-              Ending your session will securely sign you out of this browser and return to the login screen.
+            <p className="text-xs text-slate-500 dark:text-neutral-400 font-sans">
+              Ending your session will securely sign you out of this browser.
             </p>
           </div>
 
@@ -403,20 +387,20 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             <button
               type="button"
               onClick={onLogout}
-              className="inline-flex items-center justify-center space-x-2 px-4 py-2.5 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/30 dark:hover:bg-rose-900/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800/50 rounded-lg text-xs font-mono font-bold transition-colors cursor-pointer shrink-0 shadow-2xs"
+              className="inline-flex items-center justify-center space-x-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-neutral-900 dark:hover:bg-neutral-800 text-slate-800 dark:text-neutral-200 border border-slate-200 dark:border-neutral-800 rounded-xl text-xs font-mono font-bold transition-colors cursor-pointer shrink-0 shadow-2xs"
             >
               <LogOut className="w-3.5 h-3.5" />
-              <span>Log Out of Tranzit</span>
+              <span>Log Out</span>
             </button>
           )}
         </div>
       </div>
 
-      {/* Section 4: DANGER ZONE - Account Deletion (Real Accounts Only) */}
+      {/* SECTION 4: DANGER ZONE */}
       {!isDemo && (
-        <div className="bg-rose-50/70 dark:bg-rose-950/20 border-2 border-rose-200 dark:border-rose-900/60 rounded-xl p-5 sm:p-6 space-y-4">
-          <div className="flex items-center space-x-2.5 text-rose-700 dark:text-rose-400 border-b border-rose-200 dark:border-rose-900/40 pb-3">
-            <ShieldAlert className="w-5 h-5 text-rose-600 dark:text-rose-400" />
+        <div className="bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/50 rounded-2xl p-5 sm:p-6 space-y-4">
+          <div className="flex items-center space-x-2 text-rose-700 dark:text-rose-400 border-b border-rose-200 dark:border-rose-900/40 pb-3">
+            <ShieldAlert className="w-4 h-4 text-rose-600" />
             <h2 className="text-sm font-bold uppercase font-mono tracking-wider">
               Danger Zone • Account & Data Deletion
             </h2>
@@ -424,15 +408,15 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
           <div className="space-y-2">
             <p className="text-xs text-rose-950 dark:text-rose-200 font-medium">
-              Permanently erase this operator account and cascade-delete all data from the database.
+              Permanently erase this carrier account and cascade-delete all data from the database.
             </p>
-            <p className="text-xs text-rose-800/80 dark:text-rose-300/80">
-              This will irreversibly delete your owner profile, registered buses, assigned drivers, routes, scheduled maintenance records, and financial transaction history, and release your email from Firebase Auth.
+            <p className="text-xs text-rose-800/80 dark:text-rose-300/80 font-sans">
+              This will irreversibly delete your owner profile, registered buses, drivers, routes, scheduled maintenance records, and financial transaction history.
             </p>
           </div>
 
           {deleteError && (
-            <div className="p-3 bg-red-100 dark:bg-red-900/40 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-300 rounded-lg text-xs font-mono flex items-center space-x-2">
+            <div className="p-3 bg-red-100 dark:bg-red-900/40 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-300 rounded-xl text-xs font-mono flex items-center space-x-2">
               <AlertTriangle className="w-4 h-4 shrink-0" />
               <span>{deleteError}</span>
             </div>
@@ -449,10 +433,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   setNeedsPasswordReauth(false);
                   setReauthPassword('');
                 }}
-                className="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-colors flex items-center space-x-2 cursor-pointer shadow-xs"
+                className="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition-colors flex items-center space-x-2 cursor-pointer shadow-xs"
               >
                 <Trash2 className="w-4 h-4" />
-                <span>Delete Account & Wipe All Data</span>
+                <span>Delete Account & Wipe Fleet Data</span>
               </button>
             </div>
           ) : (
@@ -462,11 +446,11 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   <AlertTriangle className="w-5 h-5" />
                 </div>
                 <div className="space-y-1">
-                  <h3 className="text-xs sm:text-sm font-bold text-rose-900 dark:text-rose-200">
+                  <h3 className="text-xs sm:text-sm font-bold text-rose-900 dark:text-rose-200 font-sans">
                     Are you absolutely certain you want to delete your account?
                   </h3>
-                  <p className="text-xs text-slate-600 dark:text-neutral-400">
-                    To confirm permanent deletion of <strong className="text-rose-600 dark:text-rose-400 font-mono">{owner.email}</strong> and all fleet records, please type <code className="px-1.5 py-0.5 bg-rose-100 dark:bg-rose-950 font-mono font-bold text-rose-800 dark:text-rose-300 rounded border border-rose-200 dark:border-rose-800">DELETE</code> below:
+                  <p className="text-xs text-slate-600 dark:text-neutral-400 font-sans">
+                    To confirm permanent deletion of <strong className="text-rose-600 dark:text-rose-400 font-mono">{owner.email}</strong> and all records, type <code className="px-1.5 py-0.5 bg-rose-100 dark:bg-rose-950 font-mono font-bold text-rose-800 dark:text-rose-300 rounded border border-rose-200 dark:border-rose-800">DELETE</code> below:
                   </p>
                 </div>
               </div>
@@ -478,13 +462,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   onChange={(e) => setConfirmInput(e.target.value)}
                   placeholder="Type DELETE to confirm"
                   disabled={isDeleting}
-                  className="w-full max-w-sm px-3 py-2 bg-slate-50 dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-lg text-xs font-mono text-slate-900 dark:text-neutral-100 focus:outline-hidden focus:border-rose-500"
+                  className="w-full max-w-sm px-3 py-2 bg-slate-50 dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-xl text-xs font-mono text-slate-900 dark:text-neutral-100 focus:outline-none focus:border-rose-500"
                 />
 
                 {needsPasswordReauth && (
                   <div className="max-w-sm space-y-1.5 pt-1">
                     <label className="block text-[11px] font-mono text-rose-900 dark:text-rose-300 font-semibold">
-                      Enter your password to verify:
+                      Enter password to verify:
                     </label>
                     <input
                       type="password"
@@ -492,7 +476,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                       onChange={(e) => setReauthPassword(e.target.value)}
                       placeholder="Current account password"
                       disabled={isDeleting}
-                      className="w-full px-3 py-2 bg-slate-50 dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-lg text-xs font-mono text-slate-900 dark:text-neutral-100 focus:outline-hidden focus:border-rose-500"
+                      className="w-full px-3 py-2 bg-slate-50 dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-xl text-xs font-mono text-slate-900 dark:text-neutral-100 focus:outline-none focus:border-rose-500"
                     />
                   </div>
                 )}
@@ -503,17 +487,17 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   type="button"
                   onClick={handleExecuteDeleteAccount}
                   disabled={confirmInput.trim() !== 'DELETE' || isDeleting || (needsPasswordReauth && !reauthPassword.trim())}
-                  className="px-4 py-2 bg-rose-600 hover:bg-rose-700 disabled:bg-rose-400 dark:disabled:bg-rose-900/60 disabled:cursor-not-allowed text-white text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-colors flex items-center space-x-2 cursor-pointer shadow-xs"
+                  className="px-4 py-2 bg-rose-600 hover:bg-rose-700 disabled:bg-rose-400 dark:disabled:bg-rose-900/60 disabled:cursor-not-allowed text-white text-xs font-mono font-bold uppercase tracking-wider rounded-xl transition-colors flex items-center space-x-2 cursor-pointer shadow-xs"
                 >
                   {isDeleting ? (
                     <>
                       <RefreshCw className="w-4 h-4 animate-spin" />
-                      <span>Cascade Deleting All Account Data...</span>
+                      <span>Deleting Fleet Data...</span>
                     </>
                   ) : (
                     <>
                       <Trash2 className="w-4 h-4" />
-                      <span>{needsPasswordReauth ? 'Verify & Delete Account' : 'Permanently Delete My Account & Fleet'}</span>
+                      <span>{needsPasswordReauth ? 'Verify & Delete Account' : 'Permanently Delete Account'}</span>
                     </>
                   )}
                 </button>
@@ -528,7 +512,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                     setReauthPassword('');
                   }}
                   disabled={isDeleting}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-slate-700 dark:text-neutral-300 text-xs font-mono rounded-lg transition-colors cursor-pointer"
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-slate-700 dark:text-neutral-300 text-xs font-mono rounded-xl transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
