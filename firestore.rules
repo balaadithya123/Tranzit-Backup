@@ -32,9 +32,23 @@ service cloud.firestore {
                        ownerId == 'demo-saas-owner-rajesh' ||
                        ownerId == 'demo-lease-owner-vikram' ||
                        isAdmin();
-      allow update: if (request.auth != null && (request.auth.uid == ownerId || isAdmin())) ||
-                       ownerId == 'demo-saas-owner-rajesh' ||
-                       ownerId == 'demo-lease-owner-vikram';
+      // Owners may update their own profile, but never their own admin flag,
+      // and saasFeePerBus may only be set to one of the platform's current
+      // published tier rates — never an arbitrary client-supplied number.
+      allow update: if isAdmin() ||
+        (request.auth != null && request.auth.uid == ownerId &&
+         !('isAdmin' in request.resource.data.diff(resource.data).affectedKeys()) &&
+         (
+           !('saasFeePerBus' in request.resource.data.diff(resource.data).affectedKeys()) ||
+           request.resource.data.saasFeePerBus in [
+             get(/databases/$(database)/documents/platform_settings/pricing).data.starterRate,
+             get(/databases/$(database)/documents/platform_settings/pricing).data.growthRate,
+             get(/databases/$(database)/documents/platform_settings/pricing).data.enterpriseRate
+           ]
+         )
+        ) ||
+        ownerId == 'demo-saas-owner-rajesh' ||
+        ownerId == 'demo-lease-owner-vikram';
       allow delete: if (request.auth != null && (request.auth.uid == ownerId || isAdmin())) ||
                        ownerId == 'demo-saas-owner-rajesh' ||
                        ownerId == 'demo-lease-owner-vikram';

@@ -25,7 +25,8 @@ import {
   HelpCircle,
   Clock,
   ChevronRight,
-  Zap
+  Zap,
+  AlertCircle
 } from 'lucide-react';
 
 interface SubscriptionViewProps {
@@ -49,6 +50,7 @@ export const SubscriptionView: React.FC<SubscriptionViewProps> = ({
 
   const [selectingTierId, setSelectingTierId] = useState<SubscriptionTierId | null>(null);
   const [selectionSuccess, setSelectionSuccess] = useState<string | null>(null);
+  const [selectionError, setSelectionError] = useState<string | null>(null);
   const [contactSalesModalOpen, setContactSalesModalOpen] = useState(false);
   const [salesMessageSent, setSalesMessageSent] = useState(false);
   const [salesNote, setSalesNote] = useState('');
@@ -80,6 +82,7 @@ export const SubscriptionView: React.FC<SubscriptionViewProps> = ({
 
     setSelectingTierId(tier.id);
     setSelectionSuccess(null);
+    setSelectionError(null);
 
     const rate = getRateForTier(tier.id, pricing);
 
@@ -102,6 +105,8 @@ export const SubscriptionView: React.FC<SubscriptionViewProps> = ({
       }, 5000);
     } catch (err: any) {
       console.error('Failed to update plan selection:', err);
+      setSelectionError('Could not update your plan right now. Please try again in a moment.');
+      setTimeout(() => setSelectionError(null), 6000);
     } finally {
       setSelectingTierId(null);
     }
@@ -176,6 +181,24 @@ export const SubscriptionView: React.FC<SubscriptionViewProps> = ({
           <button
             onClick={() => setSelectionSuccess(null)}
             className="p-1 text-emerald-700 dark:text-emerald-300 hover:opacity-75 cursor-pointer"
+            aria-label="Dismiss success message"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
+      {/* Error Notification */}
+      {selectionError && (
+        <div className="p-4 bg-rose-500/10 border border-rose-500/30 text-rose-900 dark:text-rose-200 rounded-xl flex items-center justify-between shadow-xs animate-in fade-in">
+          <div className="flex items-center space-x-3">
+            <AlertCircle className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0" />
+            <p className="text-xs font-mono font-bold">{selectionError}</p>
+          </div>
+          <button
+            onClick={() => setSelectionError(null)}
+            className="p-1 text-rose-700 dark:text-rose-300 hover:opacity-75 cursor-pointer"
+            aria-label="Dismiss error message"
           >
             <X className="w-4 h-4" />
           </button>
