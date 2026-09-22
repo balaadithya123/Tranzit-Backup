@@ -359,11 +359,8 @@ export const AuthView: React.FC<AuthViewProps> = ({ onLoginSuccess }) => {
           </div>
         </div>
 
-        {/*
-          DEV RESET — CLEAR ALL DATA (testing only, not for real users)
-          NOTE: This dev tool wipes ALL accounts and data from Firestore for testing.
-          It must be removed or locked behind auth before any real user has an account.
-        */}
+        {/* This destructive fixture is deliberately excluded from production builds. */}
+        {import.meta.env.DEV && (
         <div className="mt-6 pt-4 border-t-2 border-dashed border-rose-300 dark:border-rose-900/60 text-center">
           <div className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950/80 border border-rose-300 dark:border-rose-800 text-[10px] font-mono font-bold text-rose-700 dark:text-rose-400 mb-2">
             <AlertTriangle className="w-3 h-3 text-rose-600 dark:text-rose-400 shrink-0" />
@@ -388,10 +385,11 @@ export const AuthView: React.FC<AuthViewProps> = ({ onLoginSuccess }) => {
             <span>Clear All Test Data (Database Wipe)</span>
           </button>
         </div>
+        )}
       </div>
 
       {/* Dev Reset Confirmation Modal */}
-      {showDevResetModal && (
+      {import.meta.env.DEV && showDevResetModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in duration-150">
           <div className="w-full max-w-md bg-white dark:bg-neutral-900 border-2 border-rose-500 rounded-xl shadow-2xl overflow-hidden">
             {/* Loud Header */}

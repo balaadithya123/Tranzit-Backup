@@ -1,6 +1,32 @@
 import { ServiceStatus, LicenseStatus, PermitType } from '../types';
 
 /**
+ * Parse a date-only value as a local calendar date.
+ *
+ * `new Date('YYYY-MM-DD')` is interpreted as midnight UTC, which displays as
+ * the preceding day for operators west of UTC. Fleet dates are calendar dates,
+ * not timestamps, so they must be parsed in the user's local timezone.
+ */
+export function parseCalendarDate(dateStr: string): Date | null {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateStr);
+  if (!match) return null;
+
+  const [, year, month, day] = match;
+  const date = new Date(Number(year), Number(month) - 1, Number(day));
+  return date.getFullYear() === Number(year) &&
+    date.getMonth() === Number(month) - 1 &&
+    date.getDate() === Number(day)
+    ? date
+    : null;
+}
+
+/** Format a YYYY-MM-DD calendar date without timezone shifting. */
+export function formatCalendarDate(dateStr: string, locale = 'en-IN'): string {
+  const date = parseCalendarDate(dateStr);
+  return date ? date.toLocaleDateString(locale) : dateStr;
+}
+
+/**
  * Format Indian Rupee currency: e.g. 255000 -> "₹2,55,000"
  */
 export function formatINR(amount: number): string {
@@ -20,7 +46,8 @@ export function getServiceStatus(nextServiceDueStr: string): ServiceStatus {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
-  const due = new Date(nextServiceDueStr);
+  const due = parseCalendarDate(nextServiceDueStr);
+  if (!due) return 'Good';
   due.setHours(0, 0, 0, 0);
   
   const diffTime = due.getTime() - today.getTime();
@@ -54,7 +81,10 @@ export function getLicenseValidityInfo(expiryDateStr: string): {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const expiry = new Date(expiryDateStr);
+  const expiry = parseCalendarDate(expiryDateStr);
+  if (!expiry) {
+    return { status: 'Expired', daysRemaining: -999, label: 'Invalid Expiry Date', isUrgent: true };
+  }
   expiry.setHours(0, 0, 0, 0);
 
   const diffTime = expiry.getTime() - today.getTime();
@@ -120,8 +150,8 @@ export function computeWeekdayAnomaly(
   allEntries: { date: string; ticketRevenue: number }[],
   thresholdPercent: number = ANOMALY_THRESHOLD_PERCENT
 ): AnomalyAnalysis {
-  const targetDate = new Date(targetEntry.date);
-  if (isNaN(targetDate.getTime())) {
+  const targetDate = parseCalendarDate(targetEntry.date);
+  if (!targetDate) {
     return { isAnomaly: false, expectedAvg: targetEntry.ticketRevenue, sampleCount: 0, percentDrop: 0, priorDates: [] };
   }
 
@@ -129,8 +159,8 @@ export function computeWeekdayAnomaly(
   const priorMatches: { date: string; ticketRevenue: number }[] = [];
   allEntries.forEach(entry => {
     if (entry.date === targetEntry.date) return;
-    const entryDate = new Date(entry.date);
-    if (isNaN(entryDate.getTime())) return;
+    const entryDate = parseCalendarDate(entry.date);
+    if (!entryDate) return;
 
     const diffMs = targetDate.getTime() - entryDate.getTime();
     const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
@@ -163,8 +193,8 @@ export function computeWeekdayAnomaly(
  */
 export function getDaysUntil(dateStr?: string): number | null {
   if (!dateStr || dateStr.toLowerCase().includes('paid')) return null;
-  const target = new Date(dateStr);
-  if (isNaN(target.getTime())) return null;
+  const target = parseCalendarDate(dateStr);
+  if (!target) return null;
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
