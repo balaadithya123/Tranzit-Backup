@@ -6,7 +6,7 @@ import { OwnerInsightsChat } from './OwnerInsightsChat';
 import { TelemetryInspectorModal } from './TelemetryInspectorModal';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import { formatINR, getServiceStatus, getLicenseValidityInfo, computeWeekdayAnomaly } from '../lib/utils';
+import { formatCalendarDate, formatINR, getServiceStatus, getLicenseValidityInfo } from '../lib/utils';
 import { 
   Bus as BusIcon, 
   Wallet, 
@@ -100,17 +100,16 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ owner, onNavigateTab
   }, [owner.id]);
 
   // Real Operational Metric Calculations
-  const totalBuses = buses.length || owner.fleetSize || 0;
+  const totalBuses = buses.length;
   const activeBuses = buses.filter(b => b.status === 'Active').length;
-  const maintenanceBuses = buses.filter(b => b.status === 'Maintenance').length;
-  const idleBuses = Math.max(0, totalBuses - activeBuses - maintenanceBuses);
+  const maintenanceBuses = buses.filter(b => b.status === 'In Maintenance').length;
   
   const fleetUtilizationRate = totalBuses > 0 ? Math.round((activeBuses / totalBuses) * 100) : 0;
 
   // Alerts
   const overdueServiceBuses = buses.filter(b => getServiceStatus(b.nextServiceDue) === 'Overdue' || getServiceStatus(b.nextServiceDue) === 'Due');
   const expiringLicenseDrivers = drivers.filter(d => {
-    const info = getLicenseValidityInfo(d.licenseExpiry);
+    const info = getLicenseValidityInfo(d.licenseExpiryDate);
     return info.status === 'Expired' || info.status === 'Expiring Soon';
   });
 
@@ -118,13 +117,12 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ owner, onNavigateTab
 
   // Real Revenue & Earnings Totals
   const latestEarningsEntry = earnings.length > 0 ? earnings[earnings.length - 1] : null;
-  const todayRevenueDisplay = owner.todayRevenue || (latestEarningsEntry ? latestEarningsEntry.total : 0);
-  const totalMonthlyGross = owner.monthlyGross || earnings.reduce((acc, curr) => acc + curr.total, 0);
+  const todayRevenueDisplay = owner.todayRevenue || latestEarningsEntry?.ticketRevenue || 0;
 
   // Payment method breakdown from real earnings
-  const totalUPI = earnings.reduce((sum, e) => sum + (e.breakdown?.upi || 0), 0);
-  const totalCash = earnings.reduce((sum, e) => sum + (e.breakdown?.cash || 0), 0);
-  const totalCard = earnings.reduce((sum, e) => sum + (e.breakdown?.card || 0), 0);
+  const totalUPI = earnings.reduce((sum, e) => sum + (e.upiAmount || 0), 0);
+  const totalCash = earnings.reduce((sum, e) => sum + (e.cashAmount || 0), 0);
+  const totalCard = earnings.reduce((sum, e) => sum + (e.cardAmount || 0), 0);
   const totalEarningsAll = totalUPI + totalCash + totalCard || 1;
 
   // Filtered buses list
@@ -140,8 +138,8 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ owner, onNavigateTab
     if (!matches) return false;
 
     if (fleetFilter === 'ACTIVE') return bus.status === 'Active';
-    if (fleetFilter === 'MAINTENANCE') return bus.status === 'Maintenance' || getServiceStatus(bus.nextServiceDue) === 'Due' || getServiceStatus(bus.nextServiceDue) === 'Overdue';
-    if (fleetFilter === 'IDLE') return bus.status !== 'Active' && bus.status !== 'Maintenance';
+    if (fleetFilter === 'MAINTENANCE') return bus.status === 'In Maintenance' || getServiceStatus(bus.nextServiceDue) === 'Due' || getServiceStatus(bus.nextServiceDue) === 'Overdue';
+    if (fleetFilter === 'IDLE') return bus.status === 'Idle';
     return true;
   });
 
@@ -174,7 +172,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ owner, onNavigateTab
           </button>
 
           <button
-            onClick={() => onNavigateTab('earnings')}
+            onClick={() => onNavigateTab(isSaaS ? 'earnings' : 'lease')}
             className="px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-mono font-bold rounded-xl transition-colors flex items-center space-x-1.5 cursor-pointer shadow-md shadow-blue-500/20"
           >
             <Wallet className="w-3.5 h-3.5" />
@@ -259,7 +257,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ owner, onNavigateTab
                   </div>
                 </div>
                 <span className="text-[10px] px-2 py-0.5 rounded bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 font-bold border border-rose-200 dark:border-rose-800">
-                  {bus.nextServiceDue ? new Date(bus.nextServiceDue).toLocaleDateString() : 'Due'}
+                  {bus.nextServiceDue ? formatCalendarDate(bus.nextServiceDue) : 'Due'}
                 </span>
               </div>
             ))}
@@ -274,7 +272,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ owner, onNavigateTab
                   </div>
                 </div>
                 <span className="text-[10px] px-2 py-0.5 rounded bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 font-bold border border-amber-200 dark:border-amber-800">
-                  Expires {driver.licenseExpiry ? new Date(driver.licenseExpiry).toLocaleDateString() : 'Soon'}
+                  Expires {driver.licenseExpiryDate ? formatCalendarDate(driver.licenseExpiryDate) : 'Soon'}
                 </span>
               </div>
             ))}
@@ -372,7 +370,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ owner, onNavigateTab
                         className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase shrink-0 border ${
                           bus.status === 'Active'
                             ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800'
-                            : bus.status === 'Maintenance'
+                            : bus.status === 'In Maintenance'
                             ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border-amber-200 dark:border-amber-800'
                             : 'bg-slate-100 text-slate-700 dark:bg-neutral-800 dark:text-neutral-400 border-slate-200 dark:border-neutral-700'
                         }`}
@@ -394,7 +392,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ owner, onNavigateTab
                       <div className="flex items-center justify-between text-slate-600 dark:text-neutral-300">
                         <span className="text-[10px] uppercase text-slate-400">Service Due</span>
                         <span className={`font-medium ${serviceStatus === 'Overdue' ? 'text-rose-600 font-bold' : serviceStatus === 'Due' ? 'text-amber-600 font-bold' : 'text-slate-500'}`}>
-                          {bus.nextServiceDue ? new Date(bus.nextServiceDue).toLocaleDateString() : 'Not Set'}
+                          {bus.nextServiceDue ? formatCalendarDate(bus.nextServiceDue) : 'Not Set'}
                         </span>
                       </div>
                     </div>
@@ -486,7 +484,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ owner, onNavigateTab
               Active Transit Corridors ({routes.length} Routes)
             </h3>
             <button
-              onClick={() => onNavigateTab('routes')}
+              onClick={() => onNavigateTab('fares')}
               className="text-xs font-mono text-blue-600 hover:underline font-bold"
             >
               View Route Matrix →
@@ -499,8 +497,8 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ owner, onNavigateTab
                 <tr className="text-[10px] uppercase text-slate-400 border-b border-slate-100 dark:border-neutral-800 pb-2">
                   <th className="pb-2">CORRIDOR / ROUTE</th>
                   <th className="pb-2">DISTANCE</th>
-                  <th className="pb-2">STOPS</th>
-                  <th className="pb-2">BASE FARE</th>
+                  <th className="pb-2">DAILY TRIPS</th>
+                  <th className="pb-2">FARE</th>
                   <th className="pb-2 text-right">ACTION</th>
                 </tr>
               </thead>
@@ -511,11 +509,11 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ owner, onNavigateTab
                       {route.routeName}
                     </td>
                     <td className="py-2.5 text-slate-500">{route.distanceKm || 0} km</td>
-                    <td className="py-2.5 text-slate-500">{route.stopsCount || (route.stops?.length || 0)} stops</td>
-                    <td className="py-2.5 font-bold text-slate-900 dark:text-white">{formatINR(route.baseFare || 0)}</td>
+                    <td className="py-2.5 text-slate-500">{route.tripsPerDay || 0} trips</td>
+                    <td className="py-2.5 font-bold text-slate-900 dark:text-white">{formatINR(route.computedFare || 0)}</td>
                     <td className="py-2.5 text-right">
                       <button
-                        onClick={() => onNavigateTab('routes')}
+                        onClick={() => onNavigateTab('fares')}
                         className="text-blue-600 hover:text-blue-700 font-bold"
                       >
                         Manage

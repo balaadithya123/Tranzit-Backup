@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { OwnerProfile, EarningsEntry } from '../types';
 import { collection, query, where, onSnapshot, doc, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import { formatINR, ANOMALY_THRESHOLD_PERCENT, computeWeekdayAnomaly, downloadCSV } from '../lib/utils';
+import { formatINR, ANOMALY_THRESHOLD_PERCENT, computeWeekdayAnomaly, downloadCSV, parseCalendarDate } from '../lib/utils';
 import {
   Wallet,
   TrendingUp,
@@ -92,14 +92,18 @@ export const EarningsView: React.FC<EarningsViewProps> = ({ owner }) => {
 
   const handleSaveEarningsLog = async (e: React.FormEvent) => {
     e.preventDefault();
-    const entryId = `e-${logDate}`;
+    const existingEntry = earnings.find(item => item.date === logDate);
+    // Include the owner ID so two fleets recording the same calendar day never
+    // target the same Firestore document.
+    const entryId = existingEntry?.id || `e-${owner.id}-${logDate}`;
     const totalRev = Number(cashVal) + Number(upiVal) + Number(cardVal);
 
-    const existingEntry = earnings.find(item => item.date === logDate);
     const oldRevenue = existingEntry ? (existingEntry.ticketRevenue || 0) : 0;
     const revenueDelta = totalRev - oldRevenue;
 
-    const dayName = new Date(logDate).toLocaleDateString('en-US', { weekday: 'short' });
+    const calendarDate = parseCalendarDate(logDate);
+    if (!calendarDate) return;
+    const dayName = calendarDate.toLocaleDateString('en-US', { weekday: 'short' });
 
     const newEntry: EarningsEntry = {
       id: entryId,
