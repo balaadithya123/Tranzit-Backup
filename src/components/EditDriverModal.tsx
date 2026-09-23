@@ -180,6 +180,8 @@ export const EditDriverModal: React.FC<EditDriverModalProps> = ({
           </div>
           <button
             onClick={onClose}
+            type="button"
+            aria-label="Close dialog"
             className="p-1 text-slate-400 hover:text-white hover:bg-slate-800 dark:hover:bg-neutral-800 rounded-lg transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />

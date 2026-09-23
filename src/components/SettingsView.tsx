@@ -17,13 +17,22 @@ import {
   Bus, 
   Users, 
   LogOut,
-  ArrowRight
+  ArrowRight,
+  Sun,
+  Moon,
+  Monitor,
+  Layers,
+  Clock,
+  Activity,
+  Zap,
+  Palette
 } from 'lucide-react';
 import { OwnerProfile, PlanType } from '../types';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { isDemoAccount, cascadeDeleteOwnerAccount } from '../lib/accountService';
 import { saveLocalOwner } from '../lib/firebaseAuthHelper';
+import { useTheme } from '../context/ThemeContext';
 
 interface SettingsViewProps {
   owner: OwnerProfile;
@@ -31,6 +40,8 @@ interface SettingsViewProps {
   onOpenReportsModal: () => void;
   onNavigateTab?: (tab: string) => void;
   onLogout?: () => void;
+  layoutMode?: 'island' | 'classic';
+  onToggleLayoutMode?: () => void;
 }
 
 export const SettingsView: React.FC<SettingsViewProps> = ({
@@ -38,8 +49,12 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   onAccountDeleted,
   onOpenReportsModal,
   onNavigateTab,
-  onLogout
+  onLogout,
+  layoutMode = 'island',
+  onToggleLayoutMode
 }) => {
+  const { theme, resolvedTheme, setTheme } = useTheme();
+
   // Form state
   const [name, setName] = useState(owner.name || '');
   const [companyName, setCompanyName] = useState(owner.companyName || '');
@@ -48,6 +63,37 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   const [planType, setPlanType] = useState<PlanType>(owner.planType || 'SaaS');
   const [activeBusesCount, setActiveBusesCount] = useState(owner.activeBusesCount || 0);
   const [avgDailyRiders, setAvgDailyRiders] = useState(owner.avgDailyRiders || 0);
+
+  // Telematics window & refresh rate state (persisted)
+  const [telematicsWindow, setTelematicsWindow] = useState<string>(() => {
+    try {
+      return localStorage.getItem('tranzit_telematics_window') || '30 min';
+    } catch (e) {
+      return '30 min';
+    }
+  });
+
+  const [autoRefreshEnabled, setAutoRefreshEnabled] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('tranzit_auto_refresh') !== 'false';
+    } catch (e) {
+      return true;
+    }
+  });
+
+  const handleUpdateTelematicsWindow = (val: string) => {
+    setTelematicsWindow(val);
+    try {
+      localStorage.setItem('tranzit_telematics_window', val);
+    } catch (e) {}
+  };
+
+  const handleToggleAutoRefresh = (enabled: boolean) => {
+    setAutoRefreshEnabled(enabled);
+    try {
+      localStorage.setItem('tranzit_auto_refresh', enabled ? 'true' : 'false');
+    } catch (e) {}
+  };
 
   // Status state
   const [isSaving, setIsSaving] = useState(false);
@@ -121,14 +167,14 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         <div>
           <div className="flex items-center space-x-2">
             <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-sans tracking-tight">
-              Carrier Configuration & Profile
+              Platform & System Settings
             </h1>
             <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
               Verified Operator
             </span>
           </div>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-neutral-400 mt-1">
-            Manage dispatch agency identity, operational fleet settings, exports, and account session controls.
+            Configure system appearance, telematics update frequency, carrier profile, and business parameters.
           </p>
         </div>
 
@@ -144,7 +190,177 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         </div>
       </div>
 
-      {/* SECTION 2: MAIN SETTINGS FORM */}
+      {/* SECTION 2: APPEARANCE & DISPLAY THEME SETTINGS */}
+      <div className="bg-white dark:bg-[#10131a] border border-slate-200/90 dark:border-neutral-800/80 rounded-2xl p-5 sm:p-6 shadow-2xs space-y-5">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-neutral-800">
+          <div className="flex items-center space-x-2">
+            <Palette className="w-4 h-4 text-blue-600" />
+            <h2 className="text-sm font-bold uppercase font-mono tracking-wider text-slate-900 dark:text-white">
+              Appearance & Interface Theme
+            </h2>
+          </div>
+          <span className="text-[11px] font-mono text-slate-500 dark:text-neutral-400">
+            Active: <strong className="text-blue-600 dark:text-blue-400 capitalize">{theme}</strong>
+          </span>
+        </div>
+
+        <div>
+          <label className="block text-xs font-mono uppercase text-slate-600 dark:text-neutral-400 mb-2 font-bold">
+            Display Mode
+          </label>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {/* Dark Theme Option */}
+            <button
+              type="button"
+              onClick={() => setTheme('dark')}
+              className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                theme === 'dark'
+                  ? 'border-blue-500 bg-blue-500/10 dark:bg-blue-500/15 shadow-sm ring-1 ring-blue-500/30'
+                  : 'border-slate-200 dark:border-neutral-800 hover:border-slate-300 dark:hover:border-neutral-700 bg-slate-50/50 dark:bg-neutral-900/50'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <div className="w-8 h-8 rounded-xl bg-slate-900 text-sky-400 flex items-center justify-center border border-slate-800">
+                  <Moon className="w-4 h-4" />
+                </div>
+                {theme === 'dark' && <Check className="w-4 h-4 text-blue-500 font-bold" />}
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-slate-900 dark:text-white font-mono uppercase">Dark Mode</h4>
+                <p className="text-[11px] text-slate-500 dark:text-neutral-400 mt-0.5">High-contrast nighttime operations.</p>
+              </div>
+            </button>
+
+            {/* Light Theme Option */}
+            <button
+              type="button"
+              onClick={() => setTheme('light')}
+              className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                theme === 'light'
+                  ? 'border-blue-500 bg-blue-500/10 dark:bg-blue-500/15 shadow-sm ring-1 ring-blue-500/30'
+                  : 'border-slate-200 dark:border-neutral-800 hover:border-slate-300 dark:hover:border-neutral-700 bg-slate-50/50 dark:bg-neutral-900/50'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <div className="w-8 h-8 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center border border-amber-200">
+                  <Sun className="w-4 h-4" />
+                </div>
+                {theme === 'light' && <Check className="w-4 h-4 text-blue-500 font-bold" />}
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-slate-900 dark:text-white font-mono uppercase">Light Mode</h4>
+                <p className="text-[11px] text-slate-500 dark:text-neutral-400 mt-0.5">Crisp daytime visibility.</p>
+              </div>
+            </button>
+
+            {/* System Theme Option */}
+            <button
+              type="button"
+              onClick={() => setTheme('system')}
+              className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                theme === 'system'
+                  ? 'border-blue-500 bg-blue-500/10 dark:bg-blue-500/15 shadow-sm ring-1 ring-blue-500/30'
+                  : 'border-slate-200 dark:border-neutral-800 hover:border-slate-300 dark:hover:border-neutral-700 bg-slate-50/50 dark:bg-neutral-900/50'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <div className="w-8 h-8 rounded-xl bg-slate-200 dark:bg-neutral-800 text-slate-700 dark:text-neutral-300 flex items-center justify-center">
+                  <Monitor className="w-4 h-4" />
+                </div>
+                {theme === 'system' && <Check className="w-4 h-4 text-blue-500 font-bold" />}
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-slate-900 dark:text-white font-mono uppercase">System Auto</h4>
+                <p className="text-[11px] text-slate-500 dark:text-neutral-400 mt-0.5">Sync with device OS preferences.</p>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        {/* Layout Mode Setting */}
+        {onToggleLayoutMode && (
+          <div className="pt-3 border-t border-slate-100 dark:border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <div className="flex items-center space-x-1.5 text-xs font-bold font-mono text-slate-900 dark:text-white">
+                <Layers className="w-4 h-4 text-blue-500" />
+                <span>Console Layout Architecture</span>
+              </div>
+              <p className="text-[11px] text-slate-500 dark:text-neutral-400 mt-0.5">
+                Current style: <strong className="font-mono text-blue-600 dark:text-blue-400 uppercase">{layoutMode}</strong> layout.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={onToggleLayoutMode}
+              className="px-3.5 py-2 bg-slate-100 dark:bg-neutral-900 hover:bg-slate-200 dark:hover:bg-neutral-800 border border-slate-200 dark:border-neutral-800 text-xs font-mono font-bold rounded-xl transition-colors cursor-pointer self-start sm:self-auto"
+            >
+              Switch to {layoutMode === 'island' ? 'Classic Enterprise View' : 'Island View'}
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* SECTION 3: TELEMATICS & DATA REFRESH INTERVAL ("UPDATES / TIME") */}
+      <div className="bg-white dark:bg-[#10131a] border border-slate-200/90 dark:border-neutral-800/80 rounded-2xl p-5 sm:p-6 shadow-2xs space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-neutral-800">
+          <div className="flex items-center space-x-2">
+            <Clock className="w-4 h-4 text-blue-600" />
+            <h2 className="text-sm font-bold uppercase font-mono tracking-wider text-slate-900 dark:text-white">
+              Telematics & Data Refresh Window
+            </h2>
+          </div>
+          <div className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-mono font-bold">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span>AIS-140 Stream</span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-mono uppercase text-slate-600 dark:text-neutral-400 mb-1.5 font-bold">
+              Telematics Window & Analytics Interval
+            </label>
+            <select
+              value={telematicsWindow}
+              onChange={(e) => handleUpdateTelematicsWindow(e.target.value)}
+              className="w-full px-3 py-2 bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-xl text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 cursor-pointer"
+            >
+              <option value="Live (Real-time)">Live (Real-time AIS-140)</option>
+              <option value="30 min">30 Minutes Rolling Window</option>
+              <option value="Today">Today (Current Operational Shift)</option>
+              <option value="Last 7 days">Last 7 Days Corridor Aggregation</option>
+              <option value="Last 30 days">Last 30 Days Monthly Settlement</option>
+            </select>
+            <p className="text-[11px] text-slate-500 dark:text-neutral-400 mt-1">
+              Controls the default time range applied across dispatch metrics, passenger counts, and route yield.
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-xs font-mono uppercase text-slate-600 dark:text-neutral-400 mb-1.5 font-bold">
+              Background Auto-Refresh
+            </label>
+            <div className="flex items-center justify-between p-2.5 bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-xl">
+              <div>
+                <span className="text-xs font-bold font-mono text-slate-800 dark:text-neutral-200">
+                  Real-Time Firestore Sync
+                </span>
+                <p className="text-[10px] text-slate-500 dark:text-neutral-400">
+                  Auto-update driver badges, route stages, and bus telemetry in background.
+                </p>
+              </div>
+              <input
+                type="checkbox"
+                checked={autoRefreshEnabled}
+                onChange={(e) => handleToggleAutoRefresh(e.target.checked)}
+                className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* SECTION 4: MAIN SETTINGS FORM */}
       <form onSubmit={handleSaveProfile} className="space-y-6">
         {/* OPERATOR PROFILE */}
         <div className="bg-white dark:bg-[#10131a] border border-slate-200/90 dark:border-neutral-800/80 rounded-2xl p-5 sm:p-6 shadow-2xs space-y-4">
@@ -359,7 +575,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         </div>
       </form>
 
-      {/* SECTION 3: SESSION & LOGOUT */}
+      {/* SECTION 5: SESSION & LOGOUT */}
       <div className="bg-white dark:bg-[#10131a] border border-slate-200/90 dark:border-neutral-800/80 rounded-2xl p-5 sm:p-6 shadow-2xs space-y-4">
         <div className="flex items-center justify-between border-b border-slate-100 dark:border-neutral-800 pb-3">
           <div className="flex items-center space-x-2">
@@ -396,7 +612,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
         </div>
       </div>
 
-      {/* SECTION 4: DANGER ZONE */}
+      {/* SECTION 6: DANGER ZONE */}
       {!isDemo && (
         <div className="bg-rose-50/50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/50 rounded-2xl p-5 sm:p-6 space-y-4">
           <div className="flex items-center space-x-2 text-rose-700 dark:text-rose-400 border-b border-rose-200 dark:border-rose-900/40 pb-3">
@@ -491,7 +707,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                 >
                   {isDeleting ? (
                     <>
-                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
                       <span>Deleting Fleet Data...</span>
                     </>
                   ) : (

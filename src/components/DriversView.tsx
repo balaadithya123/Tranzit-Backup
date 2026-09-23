@@ -186,26 +186,23 @@ export const DriversView: React.FC<DriversViewProps> = ({ owner }) => {
               {totalDrivers} Pilots
             </span>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-neutral-400 mt-1">
-            Commercial DL compliance, duty roster assignments, safety scores, and relief pilot standby pool.
-          </p>
         </div>
 
-        <div className="flex items-center space-x-2.5 self-start md:self-auto">
+        <div className="flex items-center space-x-2 self-start md:self-auto flex-wrap gap-y-2">
           <button
             onClick={handlePrintRoster}
-            className="px-3.5 py-2 bg-white dark:bg-neutral-900 hover:bg-slate-50 dark:hover:bg-neutral-800 border border-slate-200 dark:border-neutral-800 text-slate-700 dark:text-neutral-200 text-xs font-mono font-bold rounded-xl transition-colors flex items-center space-x-1.5 cursor-pointer shadow-2xs"
+            className="px-3.5 py-2 bg-white dark:bg-neutral-900 hover:bg-slate-50 dark:hover:bg-neutral-800 border border-slate-200 dark:border-neutral-800 text-slate-700 dark:text-neutral-200 text-xs font-mono font-bold rounded-xl transition-colors flex items-center space-x-1.5 cursor-pointer shadow-2xs whitespace-nowrap shrink-0"
             title="Print or export driver manifest"
           >
-            <Printer className="w-3.5 h-3.5 text-slate-400" />
+            <Printer className="w-3.5 h-3.5 text-slate-400 shrink-0" />
             <span>Print Manifest</span>
           </button>
 
           <button
             onClick={() => setIsAddModalOpen(true)}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-mono font-bold rounded-xl transition-colors flex items-center space-x-1.5 cursor-pointer shadow-md shadow-blue-500/20"
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-mono font-bold rounded-xl transition-colors flex items-center space-x-1.5 cursor-pointer shadow-md shadow-blue-500/20 whitespace-nowrap shrink-0"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-4 h-4 shrink-0" />
             <span>Enroll Pilot</span>
           </button>
         </div>
@@ -303,7 +300,7 @@ export const DriversView: React.FC<DriversViewProps> = ({ owner }) => {
           {/* Filter Pills & View Mode */}
           <div className="flex flex-wrap items-center gap-2">
             {/* Duty Select */}
-            <div className="flex items-center space-x-1.5 bg-slate-50 dark:bg-neutral-900 px-3 py-1 border border-slate-200 dark:border-neutral-800 rounded-full text-xs font-mono">
+            <div className="flex items-center space-x-1.5 bg-slate-50 dark:bg-neutral-900 px-3 py-1 border border-slate-200 dark:border-neutral-800 rounded-full text-xs font-mono shrink-0 whitespace-nowrap">
               <span className="text-slate-400 uppercase text-[10px] font-bold">Duty:</span>
               <select
                 value={statusFilter}
@@ -318,7 +315,7 @@ export const DriversView: React.FC<DriversViewProps> = ({ owner }) => {
             </div>
 
             {/* License Select */}
-            <div className="flex items-center space-x-1.5 bg-slate-50 dark:bg-neutral-900 px-3 py-1 border border-slate-200 dark:border-neutral-800 rounded-full text-xs font-mono">
+            <div className="flex items-center space-x-1.5 bg-slate-50 dark:bg-neutral-900 px-3 py-1 border border-slate-200 dark:border-neutral-800 rounded-full text-xs font-mono shrink-0 whitespace-nowrap">
               <span className="text-slate-400 uppercase text-[10px] font-bold">DL:</span>
               <select
                 value={licenseFilter}
@@ -333,10 +330,10 @@ export const DriversView: React.FC<DriversViewProps> = ({ owner }) => {
             </div>
 
             {/* View Mode Toggle */}
-            <div className="flex items-center space-x-1 bg-slate-50 dark:bg-neutral-900 p-1 border border-slate-200 dark:border-neutral-800 rounded-full">
+            <div className="flex items-center space-x-1 bg-slate-50 dark:bg-neutral-900 p-1 border border-slate-200 dark:border-neutral-800 rounded-full shrink-0">
               <button
                 onClick={() => setViewMode('grid')}
-                className={`px-2.5 py-1 rounded-full text-xs font-mono transition-colors cursor-pointer flex items-center space-x-1 ${
+                className={`px-2.5 py-1 rounded-full text-xs font-mono transition-colors cursor-pointer flex items-center space-x-1 whitespace-nowrap ${
                   viewMode === 'grid' ? 'bg-blue-600 text-white font-bold' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'
                 }`}
               >
@@ -345,7 +342,7 @@ export const DriversView: React.FC<DriversViewProps> = ({ owner }) => {
               </button>
               <button
                 onClick={() => setViewMode('table')}
-                className={`px-2.5 py-1 rounded-full text-xs font-mono transition-colors cursor-pointer flex items-center space-x-1 ${
+                className={`px-2.5 py-1 rounded-full text-xs font-mono transition-colors cursor-pointer flex items-center space-x-1 whitespace-nowrap ${
                   viewMode === 'table' ? 'bg-blue-600 text-white font-bold' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'
                 }`}
               >

@@ -186,13 +186,12 @@ export const ReportsModal: React.FC<ReportsModalProps> = ({
               <h3 className="text-base font-extrabold tracking-tight">
                 Export Executive Fleet Statement
               </h3>
-              <p className="text-xs text-slate-500 dark:text-neutral-400 font-mono">
-                Official PDF documentation for accounting, tax filing, and records
-              </p>
             </div>
           </div>
           <button
             onClick={onClose}
+            type="button"
+            aria-label="Close dialog"
             className="p-1.5 text-slate-400 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
@@ -351,12 +350,7 @@ export const ReportsModal: React.FC<ReportsModalProps> = ({
         )}
 
         {/* Footer Actions */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-slate-200 dark:border-neutral-800">
-          <div className="flex items-center space-x-1.5 text-[11px] font-mono text-slate-500 dark:text-neutral-400">
-            <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            <span>Formatted for Tax Filing & Fleet Record-Keeping</span>
-          </div>
-
+        <div className="flex flex-col sm:flex-row items-center justify-end gap-3 pt-3 border-t border-slate-200 dark:border-neutral-800">
           <div className="flex items-center space-x-2 w-full sm:w-auto justify-end">
             <button
               type="button"

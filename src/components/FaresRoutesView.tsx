@@ -17,7 +17,6 @@ import {
   Lock,
   AlertTriangle,
   FileCheck2,
-  Scale,
   Route as RouteIcon,
   Navigation,
   ShieldAlert
@@ -173,47 +172,32 @@ export const FaresRoutesView: React.FC<FaresRoutesViewProps> = ({ owner }) => {
 
         <button
           onClick={() => handleOpenModal()}
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-mono font-bold rounded-xl transition-colors flex items-center space-x-1.5 cursor-pointer shadow-md shadow-blue-500/20 self-start md:self-auto"
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-mono font-bold rounded-xl transition-colors flex items-center space-x-1.5 cursor-pointer shadow-md shadow-blue-500/20 self-start md:self-auto whitespace-nowrap shrink-0"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-4 h-4 shrink-0" />
           <span>Add Route Corridor</span>
         </button>
       </div>
 
-      {/* SECTION 2: STATUTORY SAFEGUARD BANNER */}
-      <div className="bg-white dark:bg-[#10131a] border border-slate-200/90 dark:border-neutral-800/80 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-2xs">
-        <div className="flex items-start space-x-3">
-          <div className="p-2.5 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 rounded-xl border border-blue-200 dark:border-blue-800/60 shrink-0">
-            <Scale className="w-5 h-5" />
-          </div>
-          <div>
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white font-sans">
-              Motor Vehicles Act Compliance Active
-            </h3>
-            <p className="text-xs text-slate-500 dark:text-neutral-400 mt-0.5 leading-relaxed font-sans">
-              Stage Carriage fares are strictly bound to State Transport Authority (STA) gazetted tariffs. Contract & Tourist permits support dynamic operator pricing.
-            </p>
+      {unverifiedCount > 0 && (
+        <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/60 rounded-2xl p-3.5 sm:p-4 flex items-center justify-between gap-4 text-xs font-mono font-bold text-amber-800 dark:text-amber-300 shadow-2xs">
+          <div className="flex items-center space-x-2">
+            <AlertTriangle className="w-4 h-4 shrink-0 text-amber-600 animate-pulse" />
+            <span>{unverifiedCount} unverified permit{unverifiedCount > 1 ? 's' : ''} require RTO verification</span>
           </div>
         </div>
-
-        {unverifiedCount > 0 && (
-          <div className="flex items-center space-x-2 bg-amber-50 dark:bg-amber-950/30 text-amber-800 dark:text-amber-300 px-3 py-1.5 rounded-xl border border-amber-200 dark:border-amber-800/60 text-xs font-mono font-bold shrink-0">
-            <AlertTriangle className="w-4 h-4 shrink-0 text-amber-600 animate-pulse" />
-            <span>{unverifiedCount} unverified permit{unverifiedCount > 1 ? 's' : ''}</span>
-          </div>
-        )}
-      </div>
+      )}
 
       {/* SECTION 3: PERMIT FILTERS & SEARCH */}
       <div className="bg-white dark:bg-[#10131a] border border-slate-200/90 dark:border-neutral-800/80 rounded-2xl p-4 sm:p-5 space-y-4 shadow-2xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           {/* Filter Pills */}
-          <div className="flex items-center space-x-2 overflow-x-auto pb-1 sm:pb-0">
+          <div className="flex items-center space-x-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
             <button
               onClick={() => setSelectedPermitFilter('all')}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-mono transition-all cursor-pointer ${
+              className={`px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-mono transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                 selectedPermitFilter === 'all'
-                  ? 'bg-blue-600 text-white font-bold'
+                  ? 'bg-blue-600 text-white font-bold shadow-xs'
                   : 'bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
@@ -222,50 +206,50 @@ export const FaresRoutesView: React.FC<FaresRoutesViewProps> = ({ owner }) => {
 
             <button
               onClick={() => setSelectedPermitFilter('stage_carriage')}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-mono transition-all flex items-center space-x-1.5 cursor-pointer ${
+              className={`px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-mono transition-all flex items-center space-x-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
                 selectedPermitFilter === 'stage_carriage'
-                  ? 'bg-blue-600 text-white font-bold'
+                  ? 'bg-blue-600 text-white font-bold shadow-xs'
                   : 'bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
-              <Lock className="w-3 h-3" />
+              <Lock className="w-3 h-3 shrink-0" />
               <span>Stage Carriage ({stageCarriageCount})</span>
             </button>
 
             <button
               onClick={() => setSelectedPermitFilter('contract_carriage')}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-mono transition-all flex items-center space-x-1.5 cursor-pointer ${
+              className={`px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-mono transition-all flex items-center space-x-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
                 selectedPermitFilter === 'contract_carriage'
-                  ? 'bg-blue-600 text-white font-bold'
+                  ? 'bg-blue-600 text-white font-bold shadow-xs'
                   : 'bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
-              <Check className="w-3 h-3" />
+              <Check className="w-3 h-3 shrink-0" />
               <span>Contract ({contractCount})</span>
             </button>
 
             <button
               onClick={() => setSelectedPermitFilter('tourist_permit')}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-mono transition-all flex items-center space-x-1.5 cursor-pointer ${
+              className={`px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-mono transition-all flex items-center space-x-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
                 selectedPermitFilter === 'tourist_permit'
-                  ? 'bg-blue-600 text-white font-bold'
+                  ? 'bg-blue-600 text-white font-bold shadow-xs'
                   : 'bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
-              <Ticket className="w-3 h-3" />
+              <Ticket className="w-3 h-3 shrink-0" />
               <span>Tourist ({touristCount})</span>
             </button>
 
             {unverifiedCount > 0 && (
               <button
                 onClick={() => setSelectedPermitFilter('unverified')}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-mono transition-all flex items-center space-x-1.5 cursor-pointer ${
+                className={`px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-mono transition-all flex items-center space-x-1.5 cursor-pointer whitespace-nowrap shrink-0 ${
                   selectedPermitFilter === 'unverified'
-                    ? 'bg-amber-600 text-white font-bold'
+                    ? 'bg-amber-600 text-white font-bold shadow-xs'
                     : 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 hover:bg-amber-100'
                 }`}
               >
-                <AlertTriangle className="w-3 h-3" />
+                <AlertTriangle className="w-3 h-3 shrink-0" />
                 <span>Unverified ({unverifiedCount})</span>
               </button>
             )}

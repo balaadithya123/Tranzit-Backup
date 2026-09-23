@@ -6,9 +6,7 @@ import { doc, onSnapshot, getDoc, setDoc, collection, query, where } from 'fireb
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { db, auth } from './lib/firebase';
 import { AuthView } from './components/AuthView';
-import { Sidebar } from './components/Sidebar';
-import { Header } from './components/Header';
-import { MobileBottomNav } from './components/MobileBottomNav';
+import { LowerNavBar } from './components/LowerNavBar';
 import { EditProfileModal } from './components/EditProfileModal';
 import { ReportsModal } from './components/ReportsModal';
 import { CommandPalette } from './components/CommandPalette';
@@ -34,7 +32,6 @@ function MainApp() {
   const [currentOwner, setCurrentOwner] = useState<OwnerProfile | null>(null);
   const [activeTab, setActiveTab] = useState<string>('overview');
   const [initializing, setInitializing] = useState(true);
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [isReportsModalOpen, setIsReportsModalOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
@@ -343,14 +340,11 @@ function MainApp() {
 
   if (initializing) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-black flex flex-col items-center justify-center p-4 transition-colors">
-        <div className="w-12 h-12 bg-slate-900 dark:bg-neutral-900 text-white dark:text-amber-400 flex items-center justify-center font-extrabold text-2xl mb-4 rounded-xl border border-slate-800 dark:border-neutral-800 shadow-md">
+      <div className="min-h-screen bg-slate-50 dark:bg-[#0c0e15] flex flex-col items-center justify-center p-4 transition-colors">
+        <div className="w-12 h-12 bg-slate-900 dark:bg-amber-500/20 text-white dark:text-amber-400 flex items-center justify-center font-black text-xl mb-3 rounded-2xl border border-slate-800 dark:border-amber-500/30 shadow-xs animate-pulse">
           TZ
         </div>
-        <div className="flex items-center space-x-2 text-xs font-mono uppercase text-slate-600 dark:text-neutral-400">
-          <RefreshCw className="w-4 h-4 animate-spin text-amber-600 dark:text-amber-400" />
-          <span>Connecting to Tranzit Fleet OS...</span>
-        </div>
+        <div className="w-5 h-5 border-2 border-slate-300 dark:border-neutral-700 border-t-blue-600 dark:border-t-amber-400 rounded-full animate-spin" />
       </div>
     );
   }
@@ -371,51 +365,16 @@ function MainApp() {
   }).length;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0c0e15] text-slate-900 dark:text-neutral-100 flex font-sans transition-colors selection:bg-blue-500/20">
-      {/* Enterprise Sidebar Navigation (Desktop Fixed / Mobile Slide-out Drawer) */}
-      <Sidebar
-        owner={currentOwner}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        layoutMode={layoutMode}
-        onToggleLayoutMode={toggleLayoutMode}
-        onLogout={handleLogout}
-        onOpenProfileModal={() => setIsEditProfileOpen(true)}
-        onOpenReportsModal={() => setIsReportsModalOpen(true)}
-        onOpenShortcutsModal={() => setIsShortcutsOpen(true)}
-        isMobileOpen={isMobileSidebarOpen}
-        setIsMobileOpen={setIsMobileSidebarOpen}
-        maintenanceAlertsCount={maintenanceAlertsCount}
-        driverAlertsCount={driverAlertsCount}
-      />
-
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0c0e15] text-slate-900 dark:text-neutral-100 flex flex-col font-sans transition-colors selection:bg-blue-500/20">
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 lg:pl-72 w-full min-h-screen pb-20 lg:pb-8">
+      <div className="flex-1 flex flex-col min-w-0 w-full min-h-screen pb-24 sm:pb-28">
         <div className="w-full max-w-7xl mx-auto p-3.5 sm:p-6 lg:p-8 flex-1 flex flex-col">
-          {/* Integrated Top Navigation Header */}
-          <Header
-            owner={currentOwner}
-            activeTab={activeTab}
-            layoutMode={layoutMode}
-            onToggleLayoutMode={toggleLayoutMode}
-            onOpenMobileSidebar={() => setIsMobileSidebarOpen(true)}
-            onOpenProfileModal={() => setIsEditProfileOpen(true)}
-            onOpenReportsModal={() => setIsReportsModalOpen(true)}
-            onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
-            onOpenShortcutsModal={() => setIsShortcutsOpen(true)}
-            onLogout={handleLogout}
-            onNavigateTab={setActiveTab}
-          />
-
           {/* Tab Module Canvas */}
-          <main className="flex-1 w-full">
+          <main className="flex-1 w-full pt-1 sm:pt-2">
           <Suspense
             fallback={
-              <div className="flex flex-col items-center justify-center py-24 bg-slate-50/50 dark:bg-neutral-900/50 border border-slate-200/80 dark:border-neutral-800 rounded-2xl">
-                <RefreshCw className="w-6 h-6 animate-spin text-blue-600 dark:text-blue-400 mb-2" />
-                <span className="font-mono text-xs uppercase tracking-wider text-slate-600 dark:text-neutral-400 font-bold">
-                  Loading Fleet Module...
-                </span>
+              <div className="flex flex-col items-center justify-center py-20 bg-white/40 dark:bg-[#10131a]/40 border border-slate-200/60 dark:border-neutral-800/60 rounded-2xl">
+                <div className="w-5 h-5 border-2 border-slate-300 dark:border-neutral-700 border-t-blue-600 dark:border-t-amber-400 rounded-full animate-spin" />
               </div>
             }
           >
@@ -439,7 +398,11 @@ function MainApp() {
             )}
 
             {activeTab === 'fleet' && (
-              <FleetMaintenanceView owner={currentOwner} />
+              <FleetMaintenanceView owner={currentOwner} initialTab="fleet" />
+            )}
+
+            {activeTab === 'maintenance' && (
+              <FleetMaintenanceView owner={currentOwner} initialTab="service" />
             )}
 
             {activeTab === 'drivers' && (
@@ -457,6 +420,8 @@ function MainApp() {
                 onOpenReportsModal={() => setIsReportsModalOpen(true)}
                 onNavigateTab={setActiveTab}
                 onLogout={handleLogout}
+                layoutMode={layoutMode}
+                onToggleLayoutMode={toggleLayoutMode}
               />
             )}
 
@@ -481,12 +446,16 @@ function MainApp() {
         </div>
       </div>
 
-      {/* Mobile Bottom Navigation Bar (Fixed 1-thumb switcher on mobile) */}
-      <MobileBottomNav
+      {/* Universal Lower Navigation Bar */}
+      <LowerNavBar
         owner={currentOwner}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        onOpenMobileDrawer={() => setIsMobileSidebarOpen(true)}
+        onOpenProfileModal={() => setIsEditProfileOpen(true)}
+        onOpenReportsModal={() => setIsReportsModalOpen(true)}
+        onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+        onOpenShortcutsModal={() => setIsShortcutsOpen(true)}
+        onLogout={handleLogout}
         maintenanceAlertsCount={maintenanceAlertsCount}
         driverAlertsCount={driverAlertsCount}
       />

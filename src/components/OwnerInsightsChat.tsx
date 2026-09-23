@@ -48,9 +48,8 @@ export const OwnerInsightsChat: React.FC<OwnerInsightsChatProps> = ({
     {
       id: 'welcome',
       sender: 'assistant',
-      text: `Hello ${firstName}! I'm your Tranzit Orchestration AI Copilot. Ask me anything about your ${safeBuses.length} fleet vehicles, dynamic dispatch yields, scheduled service checkpoints, or driver compliance.`,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      source: 'orchestration-copilot'
+      text: `Hello ${firstName}! How can I help you manage your fleet today? Ask me anything about vehicle status, route yields, scheduled maintenance, or driver compliance.`,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
   ]);
   const [inputQuery, setInputQuery] = useState('');
@@ -149,14 +148,7 @@ export const OwnerInsightsChat: React.FC<OwnerInsightsChatProps> = ({
               <h3 className="text-xs font-mono font-extrabold uppercase text-slate-900 dark:text-neutral-100 tracking-wider">
                 Fleet Intelligence Copilot
               </h3>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 font-bold border border-emerald-500/20 flex items-center space-x-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span>Autonomous</span>
-              </span>
             </div>
-            <p className="text-xs text-slate-500 dark:text-neutral-400 font-sans mt-0.5">
-              Live telemetry queries regarding route yields, vehicle health, and compliance
-            </p>
           </div>
         </div>
 

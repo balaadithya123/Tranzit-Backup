@@ -116,7 +116,7 @@ export const TelemetryInspectorModal: React.FC<TelemetryInspectorModalProps> = (
             }`}
           >
             <Gauge className="w-3.5 h-3.5" />
-            <span>Live Telemetry</span>
+            <span>Diagnostics</span>
           </button>
 
           <button

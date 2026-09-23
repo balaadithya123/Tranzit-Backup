@@ -140,16 +140,13 @@ export const FleetUtilizationChart: React.FC<FleetUtilizationChartProps> = ({
               Fleet Utilization & Route Dispatch (7-Day Rolling)
             </h3>
           </div>
-          <p className="text-xs text-slate-500 dark:text-neutral-400 font-sans mt-0.5">
-            Active revenue-generating buses vs workshop or idle standby fleet capacity
-          </p>
         </div>
 
         {/* Metric Switcher Controls */}
-        <div className="flex items-center bg-slate-100 dark:bg-neutral-900 p-0.5 rounded-lg border border-slate-200 dark:border-neutral-800 self-start sm:self-auto text-xs font-mono">
+        <div className="flex items-center bg-slate-100 dark:bg-neutral-900 p-0.5 rounded-lg border border-slate-200 dark:border-neutral-800 self-start sm:self-auto text-xs font-mono shrink-0">
           <button
             onClick={() => setSelectedMetric('percent')}
-            className={`px-2.5 py-1 rounded-md transition-colors cursor-pointer ${
+            className={`px-2.5 py-1 rounded-md transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
               selectedMetric === 'percent'
                 ? 'bg-slate-900 text-white dark:bg-amber-500/20 dark:text-amber-300 dark:border dark:border-amber-500/30 font-bold shadow-2xs'
                 : 'text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-neutral-200'
@@ -159,7 +156,7 @@ export const FleetUtilizationChart: React.FC<FleetUtilizationChartProps> = ({
           </button>
           <button
             onClick={() => setSelectedMetric('buses')}
-            className={`px-2.5 py-1 rounded-md transition-colors cursor-pointer ${
+            className={`px-2.5 py-1 rounded-md transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
               selectedMetric === 'buses'
                 ? 'bg-slate-900 text-white dark:bg-amber-500/20 dark:text-amber-300 dark:border dark:border-amber-500/30 font-bold shadow-2xs'
                 : 'text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-neutral-200'
@@ -192,31 +189,31 @@ export const FleetUtilizationChart: React.FC<FleetUtilizationChartProps> = ({
       ) : (
         <>
           {/* KPI Highlight Strip */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 my-4">
-        <div className="p-3 bg-slate-50 dark:bg-neutral-900/60 border border-slate-200 dark:border-neutral-800 rounded-lg">
-          <span className="text-[10px] font-mono uppercase text-slate-500 dark:text-neutral-400 font-bold block">7-Day Average</span>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 my-4">
+        <div className="p-2.5 sm:p-3 bg-slate-50 dark:bg-neutral-900/60 border border-slate-200 dark:border-neutral-800 rounded-lg">
+          <span className="text-[10px] font-mono uppercase text-slate-500 dark:text-neutral-400 font-bold block truncate">7-Day Average</span>
           <div className="flex items-baseline space-x-1.5 mt-0.5">
             <span className="text-xl font-bold font-mono text-slate-900 dark:text-neutral-100">{avgUtilization}%</span>
-            <span className="text-[10px] font-mono text-emerald-700 dark:text-emerald-400 font-bold bg-emerald-500/10 px-1 py-0.2 rounded border border-emerald-500/20">
+            <span className="text-[10px] font-mono text-emerald-700 dark:text-emerald-400 font-bold bg-emerald-500/10 px-1 py-0.2 rounded border border-emerald-500/20 whitespace-nowrap shrink-0">
               Optimal
             </span>
           </div>
         </div>
 
-        <div className="p-3 bg-slate-50 dark:bg-neutral-900/60 border border-slate-200 dark:border-neutral-800 rounded-lg">
-          <span className="text-[10px] font-mono uppercase text-slate-500 dark:text-neutral-400 font-bold block">Today's Utilization</span>
+        <div className="p-2.5 sm:p-3 bg-slate-50 dark:bg-neutral-900/60 border border-slate-200 dark:border-neutral-800 rounded-lg">
+          <span className="text-[10px] font-mono uppercase text-slate-500 dark:text-neutral-400 font-bold block truncate">Today's Utilization</span>
           <div className="flex items-baseline space-x-1.5 mt-0.5">
             <span className="text-xl font-bold font-mono text-slate-900 dark:text-neutral-100">
               {last7DaysData[last7DaysData.length - 1]?.utilizationPercent}%
             </span>
-            <span className="text-[10px] font-mono text-slate-500 dark:text-neutral-400">
-              ({currentActive}/{totalFleet} buses)
+            <span className="text-[10px] font-mono text-slate-500 dark:text-neutral-400 whitespace-nowrap">
+              ({currentActive}/{totalFleet})
             </span>
           </div>
         </div>
 
-        <div className="p-3 bg-slate-50 dark:bg-neutral-900/60 border border-slate-200 dark:border-neutral-800 rounded-lg">
-          <span className="text-[10px] font-mono uppercase text-slate-500 dark:text-neutral-400 font-bold block">Peak Operations</span>
+        <div className="p-2.5 sm:p-3 bg-slate-50 dark:bg-neutral-900/60 border border-slate-200 dark:border-neutral-800 rounded-lg">
+          <span className="text-[10px] font-mono uppercase text-slate-500 dark:text-neutral-400 font-bold block truncate">Peak Operations</span>
           <div className="flex items-baseline space-x-1 mt-0.5">
             <span className="text-xl font-bold font-mono text-emerald-700 dark:text-emerald-400">{peakDay.utilizationPercent}%</span>
             <span className="text-[10px] font-mono text-slate-500 dark:text-neutral-400 truncate">({peakDay.dayName})</span>

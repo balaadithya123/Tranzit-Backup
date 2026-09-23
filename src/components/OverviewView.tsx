@@ -6,7 +6,7 @@ import { OwnerInsightsChat } from './OwnerInsightsChat';
 import { TelemetryInspectorModal } from './TelemetryInspectorModal';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import { formatCalendarDate, formatINR, getServiceStatus, getLicenseValidityInfo } from '../lib/utils';
+import { formatINR, getServiceStatus, getLicenseValidityInfo, computeWeekdayAnomaly } from '../lib/utils';
 import { 
   Bus as BusIcon, 
   Wallet, 
@@ -100,16 +100,17 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ owner, onNavigateTab
   }, [owner.id]);
 
   // Real Operational Metric Calculations
-  const totalBuses = buses.length;
+  const totalBuses = buses.length || owner.fleetSize || 0;
   const activeBuses = buses.filter(b => b.status === 'Active').length;
-  const maintenanceBuses = buses.filter(b => b.status === 'In Maintenance').length;
+  const maintenanceBuses = buses.filter(b => b.status === 'Maintenance').length;
+  const idleBuses = Math.max(0, totalBuses - activeBuses - maintenanceBuses);
   
   const fleetUtilizationRate = totalBuses > 0 ? Math.round((activeBuses / totalBuses) * 100) : 0;
 
   // Alerts
   const overdueServiceBuses = buses.filter(b => getServiceStatus(b.nextServiceDue) === 'Overdue' || getServiceStatus(b.nextServiceDue) === 'Due');
   const expiringLicenseDrivers = drivers.filter(d => {
-    const info = getLicenseValidityInfo(d.licenseExpiryDate);
+    const info = getLicenseValidityInfo(d.licenseExpiry);
     return info.status === 'Expired' || info.status === 'Expiring Soon';
   });
 
@@ -117,12 +118,13 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ owner, onNavigateTab
 
   // Real Revenue & Earnings Totals
   const latestEarningsEntry = earnings.length > 0 ? earnings[earnings.length - 1] : null;
-  const todayRevenueDisplay = owner.todayRevenue || latestEarningsEntry?.ticketRevenue || 0;
+  const todayRevenueDisplay = owner.todayRevenue || (latestEarningsEntry ? latestEarningsEntry.total : 0);
+  const totalMonthlyGross = owner.monthlyGross || earnings.reduce((acc, curr) => acc + curr.total, 0);
 
   // Payment method breakdown from real earnings
-  const totalUPI = earnings.reduce((sum, e) => sum + (e.upiAmount || 0), 0);
-  const totalCash = earnings.reduce((sum, e) => sum + (e.cashAmount || 0), 0);
-  const totalCard = earnings.reduce((sum, e) => sum + (e.cardAmount || 0), 0);
+  const totalUPI = earnings.reduce((sum, e) => sum + (e.breakdown?.upi || 0), 0);
+  const totalCash = earnings.reduce((sum, e) => sum + (e.breakdown?.cash || 0), 0);
+  const totalCard = earnings.reduce((sum, e) => sum + (e.breakdown?.card || 0), 0);
   const totalEarningsAll = totalUPI + totalCash + totalCard || 1;
 
   // Filtered buses list
@@ -138,46 +140,70 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ owner, onNavigateTab
     if (!matches) return false;
 
     if (fleetFilter === 'ACTIVE') return bus.status === 'Active';
-    if (fleetFilter === 'MAINTENANCE') return bus.status === 'In Maintenance' || getServiceStatus(bus.nextServiceDue) === 'Due' || getServiceStatus(bus.nextServiceDue) === 'Overdue';
-    if (fleetFilter === 'IDLE') return bus.status === 'Idle';
+    if (fleetFilter === 'MAINTENANCE') return bus.status === 'Maintenance' || getServiceStatus(bus.nextServiceDue) === 'Due' || getServiceStatus(bus.nextServiceDue) === 'Overdue';
+    if (fleetFilter === 'IDLE') return bus.status !== 'Active' && bus.status !== 'Maintenance';
     return true;
   });
 
   return (
     <div className="space-y-8 animate-in fade-in duration-300">
-      {/* SECTION 1: HEADER & OVERVIEW BANNER */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-slate-200/80 dark:border-neutral-800">
-        <div>
-          <div className="flex items-center space-x-2">
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-sans tracking-tight">
-              Fleet Command Overview
-            </h1>
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
-              {owner.planType === 'SaaS' ? 'SaaS Fleet Owner' : 'Lease Fleet Operator'}
-            </span>
+      {/* SECTION 1: TRANZIT BRANDING & COMMAND HEADER */}
+      <div className="bg-white dark:bg-[#10131a] border border-slate-200/90 dark:border-neutral-800/80 rounded-2xl p-5 sm:p-6 shadow-2xs">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center space-x-3.5">
+            <div className="w-11 h-11 bg-slate-900 dark:bg-amber-500/20 text-white dark:text-amber-400 flex items-center justify-center font-black text-lg tracking-tighter rounded-2xl border border-slate-800 dark:border-amber-500/30 shadow-xs shrink-0">
+              TZ
+            </div>
+            <div>
+              <div className="flex items-center space-x-2">
+                <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white font-sans tracking-tight">
+                  Tranzit
+                </h1>
+                <span className="text-[10px] font-mono px-2 py-0.5 bg-slate-100 dark:bg-neutral-800 text-slate-700 dark:text-neutral-300 rounded-md font-bold border border-slate-200 dark:border-neutral-700 whitespace-nowrap shrink-0">
+                  Fleet OS
+                </span>
+              </div>
+              <div className="flex items-center flex-wrap gap-x-2 gap-y-0.5 text-xs text-slate-500 dark:text-neutral-400 font-mono mt-0.5">
+                <span className="font-semibold text-slate-800 dark:text-neutral-200 whitespace-nowrap">
+                  {owner.companyName || owner.name || 'Carrier Partner'}
+                </span>
+                <span>•</span>
+                <span className="whitespace-nowrap">{owner.city || 'Hub'}</span>
+                <span>•</span>
+                <span className="whitespace-nowrap">{totalBuses} Vehicles in Pool</span>
+              </div>
+            </div>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-neutral-400 mt-1">
-            Real-time live telemetry, fleet health, driver statuses, and revenue reconciliation for {owner.name || 'your fleet'}.
-          </p>
-        </div>
 
-        {/* Quick Hub Navigation Actions */}
-        <div className="flex items-center space-x-2.5 shrink-0 flex-wrap gap-y-2">
-          <button
-            onClick={() => onNavigateTab('fleet')}
-            className="px-3.5 py-2 bg-white dark:bg-neutral-900 hover:bg-slate-50 dark:hover:bg-neutral-800 border border-slate-200 dark:border-neutral-800 text-slate-700 dark:text-neutral-200 text-xs font-mono font-bold rounded-xl transition-colors flex items-center space-x-1.5 cursor-pointer shadow-2xs"
-          >
-            <BusIcon className="w-3.5 h-3.5 text-blue-600" />
-            <span>Manage Buses ({totalBuses})</span>
-          </button>
+          {/* Quick Hub Navigation Actions */}
+          <div className="flex items-center space-x-2 shrink-0 flex-wrap gap-y-2">
+            <button
+              onClick={() => onNavigateTab('fleet')}
+              className="px-3 sm:px-3.5 py-1.5 sm:py-2 bg-slate-50 dark:bg-neutral-900 hover:bg-slate-100 dark:hover:bg-neutral-800 border border-slate-200 dark:border-neutral-800 text-slate-700 dark:text-neutral-200 text-xs font-mono font-bold rounded-xl transition-colors flex items-center space-x-1.5 cursor-pointer shadow-2xs whitespace-nowrap shrink-0"
+            >
+              <BusIcon className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+              <span>Fleet ({totalBuses})</span>
+            </button>
 
-          <button
-            onClick={() => onNavigateTab(isSaaS ? 'earnings' : 'lease')}
-            className="px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-mono font-bold rounded-xl transition-colors flex items-center space-x-1.5 cursor-pointer shadow-md shadow-blue-500/20"
-          >
-            <Wallet className="w-3.5 h-3.5" />
-            <span>Earnings & Payouts</span>
-          </button>
+            <button
+              onClick={() => onNavigateTab('maintenance')}
+              className="px-3 sm:px-3.5 py-1.5 sm:py-2 bg-slate-50 dark:bg-neutral-900 hover:bg-slate-100 dark:hover:bg-neutral-800 border border-slate-200 dark:border-neutral-800 text-slate-700 dark:text-neutral-200 text-xs font-mono font-bold rounded-xl transition-colors flex items-center space-x-1.5 cursor-pointer shadow-2xs whitespace-nowrap shrink-0"
+            >
+              <Wrench className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+              <span>Service</span>
+              {overdueServiceBuses.length > 0 && (
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+              )}
+            </button>
+
+            <button
+              onClick={() => onNavigateTab('earnings')}
+              className="px-3.5 sm:px-4 py-1.5 sm:py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-mono font-bold rounded-xl transition-colors flex items-center space-x-1.5 cursor-pointer shadow-md shadow-blue-500/20 whitespace-nowrap shrink-0"
+            >
+              <Wallet className="w-3.5 h-3.5 shrink-0" />
+              <span>Earnings</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -257,7 +283,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ owner, onNavigateTab
                   </div>
                 </div>
                 <span className="text-[10px] px-2 py-0.5 rounded bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 font-bold border border-rose-200 dark:border-rose-800">
-                  {bus.nextServiceDue ? formatCalendarDate(bus.nextServiceDue) : 'Due'}
+                  {bus.nextServiceDue ? new Date(bus.nextServiceDue).toLocaleDateString() : 'Due'}
                 </span>
               </div>
             ))}
@@ -272,7 +298,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ owner, onNavigateTab
                   </div>
                 </div>
                 <span className="text-[10px] px-2 py-0.5 rounded bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 font-bold border border-amber-200 dark:border-amber-800">
-                  Expires {driver.licenseExpiryDate ? formatCalendarDate(driver.licenseExpiryDate) : 'Soon'}
+                  Expires {driver.licenseExpiry ? new Date(driver.licenseExpiry).toLocaleDateString() : 'Soon'}
                 </span>
               </div>
             ))}
@@ -298,9 +324,6 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ owner, onNavigateTab
             <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white font-sans">
               Live Fleet Deployment ({buses.length} Vehicles)
             </h3>
-            <p className="text-xs text-slate-500 dark:text-neutral-400">
-              Real-time route assignments, driver allocations, and maintenance schedules
-            </p>
           </div>
 
           {/* Search and Filters */}
@@ -320,9 +343,9 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ owner, onNavigateTab
               <button
                 key={filter}
                 onClick={() => setFleetFilter(filter)}
-                className={`px-3 py-1.5 rounded-full text-xs font-mono transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded-full text-xs font-mono transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                   fleetFilter === filter
-                    ? 'bg-blue-600 text-white font-bold'
+                    ? 'bg-blue-600 text-white font-bold shadow-xs'
                     : 'bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
@@ -370,7 +393,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ owner, onNavigateTab
                         className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase shrink-0 border ${
                           bus.status === 'Active'
                             ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800'
-                            : bus.status === 'In Maintenance'
+                            : bus.status === 'Maintenance'
                             ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border-amber-200 dark:border-amber-800'
                             : 'bg-slate-100 text-slate-700 dark:bg-neutral-800 dark:text-neutral-400 border-slate-200 dark:border-neutral-700'
                         }`}
@@ -392,7 +415,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ owner, onNavigateTab
                       <div className="flex items-center justify-between text-slate-600 dark:text-neutral-300">
                         <span className="text-[10px] uppercase text-slate-400">Service Due</span>
                         <span className={`font-medium ${serviceStatus === 'Overdue' ? 'text-rose-600 font-bold' : serviceStatus === 'Due' ? 'text-amber-600 font-bold' : 'text-slate-500'}`}>
-                          {bus.nextServiceDue ? formatCalendarDate(bus.nextServiceDue) : 'Not Set'}
+                          {bus.nextServiceDue ? new Date(bus.nextServiceDue).toLocaleDateString() : 'Not Set'}
                         </span>
                       </div>
                     </div>
@@ -484,7 +507,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ owner, onNavigateTab
               Active Transit Corridors ({routes.length} Routes)
             </h3>
             <button
-              onClick={() => onNavigateTab('fares')}
+              onClick={() => onNavigateTab('routes')}
               className="text-xs font-mono text-blue-600 hover:underline font-bold"
             >
               View Route Matrix →
@@ -497,8 +520,8 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ owner, onNavigateTab
                 <tr className="text-[10px] uppercase text-slate-400 border-b border-slate-100 dark:border-neutral-800 pb-2">
                   <th className="pb-2">CORRIDOR / ROUTE</th>
                   <th className="pb-2">DISTANCE</th>
-                  <th className="pb-2">DAILY TRIPS</th>
-                  <th className="pb-2">FARE</th>
+                  <th className="pb-2">STOPS</th>
+                  <th className="pb-2">BASE FARE</th>
                   <th className="pb-2 text-right">ACTION</th>
                 </tr>
               </thead>
@@ -509,11 +532,11 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ owner, onNavigateTab
                       {route.routeName}
                     </td>
                     <td className="py-2.5 text-slate-500">{route.distanceKm || 0} km</td>
-                    <td className="py-2.5 text-slate-500">{route.tripsPerDay || 0} trips</td>
-                    <td className="py-2.5 font-bold text-slate-900 dark:text-white">{formatINR(route.computedFare || 0)}</td>
+                    <td className="py-2.5 text-slate-500">{route.stopsCount || (route.stops?.length || 0)} stops</td>
+                    <td className="py-2.5 font-bold text-slate-900 dark:text-white">{formatINR(route.baseFare || 0)}</td>
                     <td className="py-2.5 text-right">
                       <button
-                        onClick={() => onNavigateTab('fares')}
+                        onClick={() => onNavigateTab('routes')}
                         className="text-blue-600 hover:text-blue-700 font-bold"
                       >
                         Manage

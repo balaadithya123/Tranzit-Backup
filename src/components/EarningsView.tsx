@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { OwnerProfile, EarningsEntry } from '../types';
 import { collection, query, where, onSnapshot, doc, setDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import { formatINR, ANOMALY_THRESHOLD_PERCENT, computeWeekdayAnomaly, downloadCSV, parseCalendarDate } from '../lib/utils';
+import { formatINR, ANOMALY_THRESHOLD_PERCENT, computeWeekdayAnomaly, downloadCSV } from '../lib/utils';
 import {
   Wallet,
   TrendingUp,
@@ -92,18 +92,14 @@ export const EarningsView: React.FC<EarningsViewProps> = ({ owner }) => {
 
   const handleSaveEarningsLog = async (e: React.FormEvent) => {
     e.preventDefault();
-    const existingEntry = earnings.find(item => item.date === logDate);
-    // Include the owner ID so two fleets recording the same calendar day never
-    // target the same Firestore document.
-    const entryId = existingEntry?.id || `e-${owner.id}-${logDate}`;
+    const entryId = `e-${logDate}`;
     const totalRev = Number(cashVal) + Number(upiVal) + Number(cardVal);
 
+    const existingEntry = earnings.find(item => item.date === logDate);
     const oldRevenue = existingEntry ? (existingEntry.ticketRevenue || 0) : 0;
     const revenueDelta = totalRev - oldRevenue;
 
-    const calendarDate = parseCalendarDate(logDate);
-    if (!calendarDate) return;
-    const dayName = calendarDate.toLocaleDateString('en-US', { weekday: 'short' });
+    const dayName = new Date(logDate).toLocaleDateString('en-US', { weekday: 'short' });
 
     const newEntry: EarningsEntry = {
       id: entryId,
@@ -216,41 +212,33 @@ export const EarningsView: React.FC<EarningsViewProps> = ({ owner }) => {
       {/* SECTION 1: HEADER & ACTIONS */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-slate-200/80 dark:border-neutral-800">
         <div>
-          <div className="flex items-center space-x-2">
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-sans tracking-tight">
-              Revenue & Carrier Settlements
-            </h1>
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
-              Live Ledger
-            </span>
-          </div>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-neutral-400 mt-1">
-            Automated fare collection breakdown, corridor settlements, and instant escrow bank payouts.
-          </p>
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white font-sans tracking-tight">
+            Revenue & Carrier Settlements
+          </h1>
         </div>
 
-        <div className="flex items-center space-x-2.5 self-start md:self-auto flex-wrap gap-y-2">
+        <div className="flex items-center space-x-2 self-start md:self-auto flex-wrap gap-y-2">
           <button
             onClick={() => setIsReportsModalOpen(true)}
-            className="px-3.5 py-2 bg-white dark:bg-neutral-900 hover:bg-slate-50 dark:hover:bg-neutral-800 border border-slate-200 dark:border-neutral-800 text-slate-700 dark:text-neutral-200 text-xs font-mono font-bold rounded-xl transition-colors flex items-center space-x-1.5 cursor-pointer shadow-2xs"
+            className="px-3.5 py-2 bg-white dark:bg-neutral-900 hover:bg-slate-50 dark:hover:bg-neutral-800 border border-slate-200 dark:border-neutral-800 text-slate-700 dark:text-neutral-200 text-xs font-mono font-bold rounded-xl transition-colors flex items-center space-x-1.5 cursor-pointer shadow-2xs whitespace-nowrap shrink-0"
           >
-            <Download className="w-3.5 h-3.5 text-blue-600" />
+            <Download className="w-3.5 h-3.5 text-blue-600 shrink-0" />
             <span>PDF Statement</span>
           </button>
 
           <button
             onClick={() => setIsSettlementModalOpen(true)}
-            className="px-3.5 py-2 bg-white dark:bg-neutral-900 hover:bg-slate-50 dark:hover:bg-neutral-800 border border-slate-200 dark:border-neutral-800 text-slate-700 dark:text-neutral-200 text-xs font-mono font-bold rounded-xl transition-colors flex items-center space-x-1.5 cursor-pointer shadow-2xs"
+            className="px-3.5 py-2 bg-white dark:bg-neutral-900 hover:bg-slate-50 dark:hover:bg-neutral-800 border border-slate-200 dark:border-neutral-800 text-slate-700 dark:text-neutral-200 text-xs font-mono font-bold rounded-xl transition-colors flex items-center space-x-1.5 cursor-pointer shadow-2xs whitespace-nowrap shrink-0"
           >
-            <Edit2 className="w-3.5 h-3.5 text-slate-400" />
+            <Edit2 className="w-3.5 h-3.5 text-slate-400 shrink-0" />
             <span>Adjust Balance</span>
           </button>
 
           <button
             onClick={() => setIsLogModalOpen(true)}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-mono font-bold rounded-xl transition-colors flex items-center space-x-1.5 cursor-pointer shadow-md shadow-blue-500/20"
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-mono font-bold rounded-xl transition-colors flex items-center space-x-1.5 cursor-pointer shadow-md shadow-blue-500/20 whitespace-nowrap shrink-0"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-4 h-4 shrink-0" />
             <span>Log Daily Revenue</span>
           </button>
         </div>
